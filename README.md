@@ -94,7 +94,3 @@ Pull requests and suggestions are welcome!
 All code should be commented in English and follow KISS and DRY principles.
 
 ---
-
-## License
-
-[MIT License](LICENSE)
