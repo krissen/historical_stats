@@ -17,6 +17,9 @@ jobs:
 
       - name: Create zip
         run: |
+          pwd
+          ls
+          ls custom_components
           cd custom_components/historical_stats
           zip historical_stats.zip -r ./
 
