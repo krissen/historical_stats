@@ -1,13 +1,14 @@
 {
   "domain": "historical_stats",
   "name": "Historical statistics",
+  "integration_type": "hub",
   "codeowners": ["@krissen"],
-  config_flow: true,
+  "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/krissen/historical_stats",
   "issue_tracker": "https://github.com/krissen/historical_stats/issues",
   "requirements": [],
-  iot_class: "iot_historical_stats",
+  iot_class: "local_polling",
   "version": "2025.6.10"
 }
 
