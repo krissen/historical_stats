@@ -1,0 +1,11 @@
+{
+  "domain": "historical_stats",
+  "name": "Historical statistics",
+  "version": "0.1.0",
+  "documentation": "https://github.com/krissen/historical_stats",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["@krissen"],
+  "config_flow": true
+}
+
