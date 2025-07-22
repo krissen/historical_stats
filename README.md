@@ -38,7 +38,7 @@ For Home Assistant to recognize the new integration, restart the server.
 
 1. Go to **Settings > Devices & Services > Add Integration** and search for **Historical statistics**.
 2. **Select the source entity** you wish to track (for example, a temperature sensor).
-3. **Optionally set the update interval and custom name.** The name defaults to the selected entity.
+3. **Optionally set the update interval and custom name.** If left blank, the entity's friendly name is used.
 4. **Add one or more measurement points.**
    - Choose statistics (min, max, mean, value at, total change).
    - Select the time period (for example "days ago" or "all history").

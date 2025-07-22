@@ -10,7 +10,7 @@
             },
             "details": {
                 "title": "Update interval and name",
-                "description": "Optional settings for the statistics sensor.",
+                "description": "Optional settings. If no name is given, the entity's friendly name is used.",
                 "data": {
                     "update_interval": "Update interval (minutes)",
                     "friendly_name": "Custom name"

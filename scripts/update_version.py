@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Update manifest version for release packaging.
 
-This script sets the "version" key in the manifest to the
-value provided on the command line.
+This script sets the "version" key in the manifest to the value
+provided on the command line and ensures it appears after the
+"name" key without duplicates.
 """
 
 import json
 import sys
+from collections import OrderedDict
 from pathlib import Path
 
 MANIFEST_PATH = (
@@ -25,13 +27,21 @@ def main() -> None:
     version = sys.argv[1]
 
     # Load manifest JSON
-    data = json.loads(MANIFEST_PATH.read_text())
+    data = json.loads(MANIFEST_PATH.read_text(), object_pairs_hook=OrderedDict)
 
-    # Update version key
-    data["version"] = version
+    # Rebuild to ensure "version" is after "name" and unique
+    new_data = OrderedDict()
+    for key, value in data.items():
+        if key == "version":
+            continue
+        new_data[key] = value
+        if key == "name":
+            new_data["version"] = version
 
-    # Write back with 2-space indentation
-    MANIFEST_PATH.write_text(json.dumps(data, indent=2) + "\n")
+    if "version" not in new_data:
+        new_data["version"] = version
+
+    MANIFEST_PATH.write_text(json.dumps(new_data, indent=2) + "\n")
 
 
 if __name__ == "__main__":
