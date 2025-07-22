@@ -21,9 +21,7 @@
                 }
             }
         },
-        "error": {
-            "invalid_combination": "Value at / Total cannot be combined with other types."
-        }
+        "error": {}
     },
     "options": {
         "step": {

@@ -9,7 +9,7 @@ from homeassistant.helpers.selector import (
     TextSelector,
 )
 
-from .const import DOMAIN, ERROR_INVALID_COMBINATION
+from .const import DOMAIN
 
 # Available statistic types
 STAT_TYPES = [
@@ -93,35 +93,35 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             time_unit = user_input["time_unit"]
             time_value = user_input.get("time_value", 1)
 
-            # Special case: if value_at or total is selected, only one allowed
-            if (
-                any(t in selected_types for t in ["value_at", "total"])
-                and len(selected_types) > 1
-            ):
-                # Use translation key for error to support localization
-                errors["stat_types"] = ERROR_INVALID_COMBINATION
-            else:
-                for stat_type in selected_types:
-                    self.measure_points.append(
-                        {
-                            "stat_type": stat_type,
-                            "time_unit": time_unit,
-                            "time_value": time_value,
-                        }
-                    )
-                if user_input.get("add_another", False):
-                    return await self.async_step_add_point()
-                entry_data = dict(self.data)
-                entry_options = {"points": self.measure_points}
-                friendly_name = entry_data.get("friendly_name")
-                if not friendly_name:
-                    state = self.hass.states.get(entry_data["entity_id"])
-                    friendly_name = state.name if state else entry_data["entity_id"]
-                return self.async_create_entry(
-                    title=f"Historical statistics: {friendly_name}",
-                    data=entry_data,
-                    options=entry_options,
+            # Enforce exclusive types: "value_at" and "total" cannot be combined
+            exclusive = [t for t in selected_types if t in ["value_at", "total"]]
+            if exclusive:
+                # Keep only the last exclusive type chosen
+                selected_types = [exclusive[-1]]
+
+            for stat_type in selected_types:
+                self.measure_points.append(
+                    {
+                        "stat_type": stat_type,
+                        "time_unit": time_unit,
+                        "time_value": time_value,
+                    }
                 )
+
+            if user_input.get("add_another", False):
+                return await self.async_step_add_point()
+
+            entry_data = dict(self.data)
+            entry_options = {"points": self.measure_points}
+            friendly_name = entry_data.get("friendly_name")
+            if not friendly_name:
+                state = self.hass.states.get(entry_data["entity_id"])
+                friendly_name = state.name if state else entry_data["entity_id"]
+            return self.async_create_entry(
+                title=f"Historical statistics: {friendly_name}",
+                data=entry_data,
+                options=entry_options,
+            )
 
         # Use SelectSelector for proper multi-select in the HA UI
         return self.async_show_form(
@@ -146,7 +146,7 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             description_placeholders={
                 "info": (
                     "Select one or more statistics for this period. "
-                    "Note: 'Value at' and 'Total change' cannot be combined with others."
+                    "'Value at' and 'Total change' will replace any other selections."
                 )
             },
             errors=errors,
