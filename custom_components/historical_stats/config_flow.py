@@ -6,6 +6,7 @@ from homeassistant.helpers.selector import (
     EntitySelector,
     NumberSelector,
     SelectSelector,
+    TextSelector,
 )
 
 from .const import DOMAIN
@@ -45,21 +46,40 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         errors = {}
-        if user_input is not None:
-            # Unique per entity
+
+        # If friendly_name was provided, the user confirmed the form
+        if user_input is not None and "friendly_name" in user_input:
             await self.async_set_unique_id(user_input["entity_id"])
             self._abort_if_unique_id_configured()
             self.data = user_input
             return await self.async_step_add_point()
+
+        # Determine placeholder based on the selected entity
+        placeholder = "friendly name"
+        entity_default = None
+        update_default = 30
+        if user_input is not None:
+            entity_default = user_input.get("entity_id")
+            update_default = user_input.get("update_interval", 30)
+            if entity_default:
+                state = self.hass.states.get(entity_default)
+                placeholder = state.name if state else entity_default
+
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required("entity_id"): EntitySelector({"multiple": False}),
-                    vol.Optional("update_interval", default=30): NumberSelector(
+                    vol.Required("entity_id", default=entity_default): EntitySelector(
+                        {"multiple": False}
+                    ),
+                    vol.Optional(
+                        "update_interval", default=update_default
+                    ): NumberSelector(
                         {"min": 1, "max": 1440, "unit_of_measurement": "min"}
                     ),
-                    vol.Optional("friendly_name"): str,
+                    vol.Optional("friendly_name"): TextSelector(
+                        {"placeholder": placeholder}
+                    ),
                 }
             ),
             errors=errors,
