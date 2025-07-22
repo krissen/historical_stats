@@ -6,8 +6,8 @@
                 "description": "Select the source entity and update interval.",
                 "data": {
                     "entity_id": "Entity",
-                    "update_interval": "Update interval (minutes)",
-                },
+                    "update_interval": "Update interval (minutes)"
+                }
             },
             "add_point": {
                 "title": "Add measurement point",
@@ -16,11 +16,11 @@
                     "stat_types": "Statistics types",
                     "time_unit": "Time unit",
                     "time_value": "Time value",
-                    "add_another": "Add another",
-                },
-            },
+                    "add_another": "Add another"
+                }
+            }
         },
-        "error": {},
+        "error": {}
     },
     "options": {
         "step": {
@@ -31,8 +31,8 @@
                     "add_point": "Add point",
                     "remove_index": "Remove index",
                     "edit_index": "Edit index",
-                    "finish": "Finish",
-                },
+                    "finish": "Finish"
+                }
             },
             "add_point": {
                 "title": "Add measurement point",
@@ -40,8 +40,8 @@
                 "data": {
                     "stat_type": "Statistic type",
                     "time_unit": "Time unit",
-                    "time_value": "Time value",
-                },
+                    "time_value": "Time value"
+                }
             },
             "edit_point": {
                 "title": "Edit measurement point",
@@ -49,9 +49,9 @@
                 "data": {
                     "stat_type": "Statistic type",
                     "time_unit": "Time unit",
-                    "time_value": "Time value",
-                },
-            },
+                    "time_value": "Time value"
+                }
+            }
         }
-    },
+    }
 }

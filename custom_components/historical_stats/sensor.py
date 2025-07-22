@@ -1,3 +1,5 @@
+"""Sensor platform providing configurable historical statistics."""
+
 from datetime import timedelta
 
 import homeassistant.util.dt as dt_util
@@ -26,6 +28,7 @@ class HistoricalStatsSensor(SensorEntity):
         self._attr_name = name
         self._attr_unique_id = f"historical_stats_{slugify(entity_id)}"
         self._entity_id = entity_id
+        # Each point defines a statistic type and time window
         self._points = points
         self._attr_native_value = STATE_UNKNOWN
         self._attr_extra_state_attributes = {}
@@ -36,6 +39,7 @@ class HistoricalStatsSensor(SensorEntity):
         attrs = {}
         status = STATE_OK
 
+        # Iterate over configured measurement points
         for i, point in enumerate(self._points, 1):
             stat_type = point["stat_type"]
             unit = point.get("time_unit", "days")

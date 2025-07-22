@@ -5,7 +5,7 @@
   "integration_type": "hub",
   "codeowners": ["@krissen"],
   "config_flow": true,
-  "dependencies": [],
+  "dependencies": ["recorder"],
   "documentation": "https://github.com/krissen/historical_stats",
   "issue_tracker": "https://github.com/krissen/historical_stats/issues",
   "requirements": [],
