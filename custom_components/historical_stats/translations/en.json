@@ -2,10 +2,16 @@
     "config": {
         "step": {
             "user": {
-                "title": "Configure Historical statistics",
-                "description": "Select the source entity and update interval.",
+                "title": "Select entity",
+                "description": "Choose the entity to track.",
                 "data": {
-                    "entity_id": "Entity",
+                    "entity_id": "Entity"
+                }
+            },
+            "details": {
+                "title": "Update interval and name",
+                "description": "Optional settings for the statistics sensor.",
+                "data": {
                     "update_interval": "Update interval (minutes)",
                     "friendly_name": "Custom name"
                 }

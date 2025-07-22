@@ -43,48 +43,59 @@ TIME_UNITS = {
 
 
 class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle the config flow for the integration."""
+
     VERSION = 1
 
     def __init__(self):
-        self.data = {}
-        self.measure_points = []
+        self.data: dict = {}
+        self.measure_points: list = []
 
     async def async_step_user(self, user_input=None):
+        """Initial step: select the source entity."""
         errors = {}
 
-        # Proceed to next step whenever the form is submitted
         if user_input is not None:
             await self.async_set_unique_id(user_input["entity_id"])
             self._abort_if_unique_id_configured()
-            self.data = user_input
-            return await self.async_step_add_point()
-
-        # Determine placeholder based on the selected entity
-        placeholder = "friendly name"
-        entity_default = None
-        update_default = 30
-        if user_input is not None:
-            entity_default = user_input.get("entity_id")
-            update_default = user_input.get("update_interval", 30)
-            if entity_default:
-                state = self.hass.states.get(entity_default)
-                placeholder = state.name if state else entity_default
+            self.data = {"entity_id": user_input["entity_id"]}
+            return await self.async_step_details()
 
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
+                {vol.Required("entity_id"): EntitySelector({"multiple": False})}
+            ),
+            errors=errors,
+        )
+
+    async def async_step_details(self, user_input=None):
+        """Configure friendly name and update interval."""
+        errors = {}
+
+        entity_id = self.data.get("entity_id")
+        state = self.hass.states.get(entity_id) if entity_id else None
+        placeholder = state.name if state else entity_id
+
+        update_default = self.data.get("update_interval", 30)
+        friendly_default = self.data.get("friendly_name")
+
+        if user_input is not None:
+            self.data.update(user_input)
+            return await self.async_step_add_point()
+
+        return self.async_show_form(
+            step_id="details",
+            data_schema=vol.Schema(
                 {
-                    vol.Required("entity_id", default=entity_default): EntitySelector(
-                        {"multiple": False}
-                    ),
                     vol.Optional(
                         "update_interval", default=update_default
                     ): NumberSelector(
                         {"min": 1, "max": 1440, "unit_of_measurement": "min"}
                     ),
-                    vol.Optional("friendly_name"): TextSelector(
-                        {"placeholder": placeholder}
-                    ),
+                    vol.Optional(
+                        "friendly_name", default=friendly_default
+                    ): TextSelector({"placeholder": placeholder}),
                 }
             ),
             errors=errors,
