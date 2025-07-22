@@ -1,3 +1,5 @@
+"""Config flow for the Historical statistics integration."""
+
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.helpers.selector import (

@@ -1,3 +1,5 @@
+"""Home Assistant custom integration for configurable historical statistics."""
+
 from .const import DOMAIN, PLATFORMS
 
 
