@@ -1,6 +1,7 @@
 {
   "domain": "historical_stats",
   "name": "Historical statistics",
+  "content_in_root": true,
   "integration_type": "hub",
   "codeowners": ["@krissen"],
   "config_flow": true,
