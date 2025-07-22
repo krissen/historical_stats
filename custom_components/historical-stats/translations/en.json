@@ -8,6 +8,16 @@
           "entity_id": "Entity",
           "update_interval": "Update interval (minutes)"
         }
+      },
+      "add_point": {
+        "title": "Add measurement point",
+        "description": "{info}",
+        "data": {
+          "stat_types": "Statistics types",
+          "time_unit": "Time unit",
+          "time_value": "Time value",
+          "add_another": "Add another"
+        }
       }
     },
     "error": {}
@@ -16,7 +26,21 @@
     "step": {
       "init": {
         "title": "Configure measurement points",
-        "description": "Add or edit the measurement points for this statistics sensor."
+        "description": "{current_points}",
+        "data": {
+          "add_point": "Add point",
+          "remove_index": "Remove index",
+          "finish": "Finish"
+        }
+      },
+      "add_point": {
+        "title": "Add measurement point",
+        "description": "Set the parameters for the measurement point.",
+        "data": {
+          "stat_type": "Statistic type",
+          "time_unit": "Time unit",
+          "time_value": "Time value"
+        }
       }
     }
   }

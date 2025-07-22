@@ -82,7 +82,6 @@ def find_missing_and_redundant():
 
 def find_used_keys_in_py():
     used_keys = set()
-    pattern = re.compile(r'["\']([a-zA-Z0-9_.-]+)["\']')
     for py_file in PY_FILES_TO_SCAN:
         if py_file.exists():
             content = py_file.read_text(encoding="utf-8")
