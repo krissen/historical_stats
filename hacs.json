@@ -3,5 +3,5 @@
   "hide_default_branch": true,
   "zip_release": true,
   "filename": "historical_stats.zip",
-  "content_in_root": true
+  "content_in_root": false
 }
