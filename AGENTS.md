@@ -1,5 +1,9 @@
 # AGENTS.md
 
+## Project Purpose
+
+This project is a Home Assistant custom integration that provides flexible, configurable historical statistics for any entity. It exposes user-defined measurement points (such as “max last 7 days” or “value 24h ago”) as attributes on a sensor entity, using efficient and DRY principles.
+
 ## Automated Agent Instructions
 
 ### Directory and File Handling
