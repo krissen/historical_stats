@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure Historical statistics",
+        "description": "Select the source entity and update interval.",
+        "data": {
+          "entity_id": "Entity",
+          "update_interval": "Update interval (minutes)"
+        }
+      }
+    },
+    "error": {}
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configure measurement points",
+        "description": "Add or edit the measurement points for this statistics sensor."
+      }
+    }
+  }
+}
+
