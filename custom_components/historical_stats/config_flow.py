@@ -2,7 +2,15 @@
 
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.helpers.selector import EntitySelector, NumberSelector, TextSelector
+from homeassistant.helpers.selector import EntitySelector, NumberSelector
+
+try:
+    from homeassistant.helpers.selector import TextSelector
+
+    _HAS_TEXT = True
+except Exception:  # pragma: no cover - older HA versions
+    TextSelector = None
+    _HAS_TEXT = False
 
 try:
     from homeassistant.helpers.selector import SelectSelector
@@ -97,9 +105,9 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     ): NumberSelector(
                         {"min": 1, "max": 1440, "unit_of_measurement": "min"}
                     ),
-                    vol.Optional(
-                        "friendly_name", default=friendly_default
-                    ): TextSelector({"placeholder": placeholder}),
+                    vol.Optional("friendly_name", default=friendly_default): (
+                        TextSelector({"placeholder": placeholder}) if _HAS_TEXT else str
+                    ),
                 }
             ),
             errors=errors,
