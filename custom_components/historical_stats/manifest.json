@@ -1,6 +1,7 @@
 {
   "domain": "historical_stats",
   "name": "Historical statistics",
+  "version": "0.1.0",
   "codeowners": ["@krissen"],
   "dependencies": ["recorder"],
   "documentation": "https://github.com/krissen/historical_stats",
