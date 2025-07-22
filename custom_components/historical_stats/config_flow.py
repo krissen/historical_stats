@@ -2,12 +2,17 @@
 
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.helpers.selector import (
-    EntitySelector,
-    NumberSelector,
-    SelectSelector,
-    TextSelector,
-)
+from homeassistant.helpers.selector import EntitySelector, NumberSelector, TextSelector
+
+try:
+    from homeassistant.helpers.selector import SelectSelector
+
+    _HAS_SELECT = True
+except Exception:  # pragma: no cover - older HA versions
+    SelectSelector = None
+    _HAS_SELECT = False
+
+from homeassistant.helpers import config_validation as cv
 
 from .const import DOMAIN
 
@@ -123,21 +128,25 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 options=entry_options,
             )
 
-        # Use SelectSelector for proper multi-select in the HA UI
+        stat_selector = (
+            SelectSelector(
+                {
+                    "options": [
+                        {"value": v, "label": STAT_TYPE_LABELS[v]} for v in STAT_TYPES
+                    ],
+                    "multiple": True,
+                    "mode": "dropdown",
+                }
+            )
+            if _HAS_SELECT
+            else vol.All(cv.ensure_list, [vol.In(STAT_TYPES)])
+        )
+
         return self.async_show_form(
             step_id="add_point",
             data_schema=vol.Schema(
                 {
-                    vol.Required("stat_types", default=["min", "max"]): SelectSelector(
-                        {
-                            "options": [
-                                {"value": v, "label": STAT_TYPE_LABELS[v]}
-                                for v in STAT_TYPES
-                            ],
-                            "multiple": True,
-                            "mode": "dropdown",
-                        }
-                    ),
+                    vol.Required("stat_types", default=["min", "max"]): stat_selector,
                     vol.Required("time_unit", default="days"): vol.In(TIME_UNITS),
                     vol.Optional("time_value", default=1): int,
                     vol.Optional("add_another", default=False): bool,
@@ -175,19 +184,26 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
         choices = [
             {"value": str(i), "label": lbl} for i, lbl in enumerate(point_labels)
         ]
+        remove_selector = (
+            SelectSelector({"options": choices, "multiple": True, "mode": "list"})
+            if _HAS_SELECT and choices
+            else vol.All(cv.ensure_list, [vol.In([c["value"] for c in choices])])
+            if choices
+            else []
+        )
+        edit_selector = (
+            SelectSelector({"options": choices, "multiple": False})
+            if _HAS_SELECT and choices
+            else vol.In([c["value"] for c in choices])
+            if choices
+            else str
+        )
+
         schema = vol.Schema(
             {
                 vol.Optional("add_point", default=False): bool,
-                vol.Optional("remove_indices", default=[]): SelectSelector(
-                    {"options": choices, "multiple": True, "mode": "list"}
-                )
-                if choices
-                else [],
-                vol.Optional("edit_index"): SelectSelector(
-                    {"options": choices, "multiple": False}
-                )
-                if choices
-                else str,
+                vol.Optional("remove_indices", default=[]): remove_selector,
+                vol.Optional("edit_index"): edit_selector,
                 vol.Optional("finish", default=True): bool,
             }
         )
