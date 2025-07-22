@@ -82,9 +82,6 @@ class HistoricalStatsSensor(SensorEntity):
                         if found:
                             attrs[label] = found.state
                             attrs[f"{label}_ts"] = found.last_changed.isoformat()
-                            attrs[f"{label}_ts_human"] = dt_util.as_local(
-                                found.last_changed
-                            ).strftime("%Y-%m-%d %H:%M:%S")
                         else:
                             attrs[label] = STATE_UNKNOWN
                         continue
@@ -108,16 +105,10 @@ class HistoricalStatsSensor(SensorEntity):
                     min_val, min_state = min(numeric_states, key=lambda x: x[0])
                     attrs[label] = min_val
                     attrs[f"{label}_ts"] = min_state.last_changed.isoformat()
-                    attrs[f"{label}_ts_human"] = dt_util.as_local(
-                        min_state.last_changed
-                    ).strftime("%Y-%m-%d %H:%M:%S")
                 elif stat_type == "max":
                     max_val, max_state = max(numeric_states, key=lambda x: x[0])
                     attrs[label] = max_val
                     attrs[f"{label}_ts"] = max_state.last_changed.isoformat()
-                    attrs[f"{label}_ts_human"] = dt_util.as_local(
-                        max_state.last_changed
-                    ).strftime("%Y-%m-%d %H:%M:%S")
                 elif stat_type == "mean":
                     attrs[label] = sum(values_only) / len(values_only)
                 elif stat_type == "total":
