@@ -102,7 +102,7 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="add_point",
             data_schema=vol.Schema(
                 {
-                    vol.Required("stat_types", default=["min"]): SelectSelector(
+                    vol.Required("stat_types", default=["min", "max"]): SelectSelector(
                         {
                             "options": [
                                 {"value": v, "label": STAT_TYPE_LABELS[v]}

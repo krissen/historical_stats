@@ -4,6 +4,8 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.recorder.history import get_significant_states
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_UNKNOWN
+
+from .const import STATE_ERROR, STATE_NO_DATA, STATE_OK
 from homeassistant.util import slugify
 
 
@@ -32,6 +34,7 @@ class HistoricalStatsSensor(SensorEntity):
         """Fetch and calculate statistics for each point."""
         now = dt_util.utcnow()
         attrs = {}
+        status = STATE_OK
 
         for i, point in enumerate(self._points, 1):
             stat_type = point["stat_type"]
@@ -39,55 +42,61 @@ class HistoricalStatsSensor(SensorEntity):
             value = int(point.get("time_value", 1))
             label = f"{stat_type}_{value}_{unit}"
 
-            # Calculate start/end for query
-            if unit == "all":
-                start = None
-                end = now
-            else:
-                delta = {
-                    "minutes": timedelta(minutes=value),
-                    "hours": timedelta(hours=value),
-                    "days": timedelta(days=value),
-                    "weeks": timedelta(weeks=value),
-                    "months": timedelta(days=value * 30),
-                }.get(unit, timedelta(days=value))
-                if stat_type == "value_at":
-                    target_time = now - delta
-                    # Query around this time (find nearest state)
-                    states = await self._get_states_around(
-                        target_time, delta=timedelta(minutes=10)
-                    )
-                    found = self._find_closest_state(states, target_time)
-                    attrs[label] = found.state if found else STATE_UNKNOWN
-                    continue
+            try:
+                if unit == "all":
+                    start = None
+                    end = now
                 else:
+                    delta = {
+                        "minutes": timedelta(minutes=value),
+                        "hours": timedelta(hours=value),
+                        "days": timedelta(days=value),
+                        "weeks": timedelta(weeks=value),
+                        "months": timedelta(days=value * 30),
+                    }.get(unit, timedelta(days=value))
+
+                    if stat_type == "value_at":
+                        target_time = now - delta
+                        states = await self._get_states_around(
+                            target_time, delta=timedelta(minutes=10)
+                        )
+                        found = self._find_closest_state(states, target_time)
+                        attrs[label] = found.state if found else STATE_UNKNOWN
+                        continue
+
                     start = now - delta
                     end = now
 
-            # Query history for interval
-            states = await self._get_states_interval(start, end)
-            numeric_states = self._states_to_float(states)
+                states = await self._get_states_interval(start, end)
+                numeric_states = self._states_to_float(states)
 
-            if not numeric_states:
+                if not numeric_states:
+                    attrs[label] = STATE_UNKNOWN
+                    if status == STATE_OK:
+                        status = STATE_NO_DATA
+                    continue
+
+                if stat_type == "min":
+                    attrs[label] = min(numeric_states)
+                elif stat_type == "max":
+                    attrs[label] = max(numeric_states)
+                elif stat_type == "mean":
+                    attrs[label] = sum(numeric_states) / len(numeric_states)
+                elif stat_type == "total":
+                    attrs[label] = (
+                        numeric_states[-1] - numeric_states[0]
+                        if len(numeric_states) >= 2
+                        else STATE_UNKNOWN
+                    )
+                else:
+                    attrs[label] = STATE_UNKNOWN
+            except Exception:
+                status = STATE_ERROR
                 attrs[label] = STATE_UNKNOWN
                 continue
 
-            if stat_type == "min":
-                attrs[label] = min(numeric_states)
-            elif stat_type == "max":
-                attrs[label] = max(numeric_states)
-            elif stat_type == "mean":
-                attrs[label] = sum(numeric_states) / len(numeric_states)
-            elif stat_type == "total":
-                attrs[label] = (
-                    numeric_states[-1] - numeric_states[0]
-                    if len(numeric_states) >= 2
-                    else STATE_UNKNOWN
-                )
-            else:
-                attrs[label] = STATE_UNKNOWN
-
         self._attr_extra_state_attributes = attrs
+        self._attr_native_value = status
 
     async def _get_states_around(self, target_time, delta=timedelta(minutes=10)):
         """Return all states within +-delta of target_time."""
