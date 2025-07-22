@@ -1,11 +1,9 @@
-import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.helpers.selector import (
     EntitySelector,
     NumberSelector,
     SelectSelector,
-    TextSelector,
 )
 
 from .const import DOMAIN
@@ -144,7 +142,7 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
         """Show current points and options to add/remove."""
         errors = {}
         point_labels = [
-            f"{i+1}: {point['stat_type']} {point.get('time_value', '')} {point.get('time_unit', '')}"
+            f"{i + 1}: {point['stat_type']} {point.get('time_value', '')} {point.get('time_unit', '')}"
             for i, point in enumerate(self.points)
         ]
         choices = {str(i): lbl for i, lbl in enumerate(point_labels)}

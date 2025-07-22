@@ -1,12 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.recorder.history import get_significant_states
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_UNKNOWN
 from homeassistant.util import slugify
-
-from .const import DOMAIN
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
