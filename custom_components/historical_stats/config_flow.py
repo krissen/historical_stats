@@ -52,8 +52,8 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         errors = {}
 
-        # If friendly_name was provided, the user confirmed the form
-        if user_input is not None and "friendly_name" in user_input:
+        # Proceed to next step whenever the form is submitted
+        if user_input is not None:
             await self.async_set_unique_id(user_input["entity_id"])
             self._abort_if_unique_id_configured()
             self.data = user_input
