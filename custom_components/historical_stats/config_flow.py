@@ -75,10 +75,14 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         entity_id = self.data.get("entity_id")
         state = self.hass.states.get(entity_id) if entity_id else None
-        placeholder = state.name if state else entity_id
+        placeholder = "friendly name"
+        if state:
+            placeholder = state.name
 
         update_default = self.data.get("update_interval", 30)
         friendly_default = self.data.get("friendly_name")
+        if friendly_default is None:
+            friendly_default = placeholder
 
         if user_input is not None:
             self.data.update(user_input)

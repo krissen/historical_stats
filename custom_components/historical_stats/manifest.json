@@ -9,7 +9,6 @@
   "iot_class": "local_polling",
   "requirements": [],
   "issue_tracker": "https://github.com/krissen/historical_stats/issues",
-  "config_flow": true,
-  "version": "0.0.3-beta1"
+  "config_flow": true
 }
 
