@@ -6,8 +6,14 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.recorder.history import get_significant_states
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_UNKNOWN
+from homeassistant.helpers.event import async_track_time_interval
 
-from .const import STATE_ERROR, STATE_NO_DATA, STATE_OK
+from .const import (
+    STATE_ERROR,
+    STATE_NO_DATA,
+    STATE_OK,
+    DEFAULT_UPDATE_INTERVAL,
+)
 from homeassistant.util import slugify
 
 
@@ -15,6 +21,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     """Set up a HistoricalStatsSensor from a config entry."""
     entity_id = entry.data["entity_id"]
     points = entry.options.get("points", [])
+    update_interval = entry.data.get("update_interval", DEFAULT_UPDATE_INTERVAL)
     friendly_name = entry.data.get("friendly_name")
 
     if not friendly_name:
@@ -24,20 +31,25 @@ async def async_setup_entry(hass, entry, async_add_entities):
     name = f"Historical statistics for {friendly_name}"
 
     async_add_entities(
-        [HistoricalStatsSensor(hass, name, entity_id, points)], update_before_add=True
+        [HistoricalStatsSensor(hass, name, entity_id, points, update_interval)],
+        update_before_add=True,
     )
 
 
 class HistoricalStatsSensor(SensorEntity):
     """Sensor that calculates historical statistics for a given entity."""
 
-    def __init__(self, hass, name, entity_id, points):
+    _attr_should_poll = False
+
+    def __init__(self, hass, name, entity_id, points, update_interval):
         self.hass = hass
         self._attr_name = name
         self._attr_unique_id = f"historical_stats_{slugify(entity_id)}"
         self._entity_id = entity_id
         # Each point defines a statistic type and time window
         self._points = points
+        self._update_interval = timedelta(minutes=update_interval)
+        self._unsub_update = None
         self._attr_native_value = STATE_UNKNOWN
         self._attr_extra_state_attributes = {}
 
@@ -45,6 +57,24 @@ class HistoricalStatsSensor(SensorEntity):
     def suggested_object_id(self):
         """Return stable entity id based on source entity."""
         return f"historical_stats_{slugify(self._entity_id)}"
+
+    async def async_added_to_hass(self):
+        """Schedule periodic updates when entity is added."""
+
+        self._unsub_update = async_track_time_interval(
+            self.hass, self._scheduled_update, self._update_interval
+        )
+
+    async def async_will_remove_from_hass(self):
+        """Clean up when entity is removed."""
+        if self._unsub_update is not None:
+            self._unsub_update()
+            self._unsub_update = None
+
+    async def _scheduled_update(self, _now):
+        """Handle the scheduled update callback."""
+        await self.async_update()
+        self.async_write_ha_state()
 
     async def async_update(self):
         """Fetch and calculate statistics for each point."""
