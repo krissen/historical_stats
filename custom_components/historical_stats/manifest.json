@@ -8,7 +8,7 @@
   "documentation": "https://github.com/krissen/historical_stats",
   "issue_tracker": "https://github.com/krissen/historical_stats/issues",
   "requirements": [],
-  iot_class: "local_polling",
+  "iot_class": "local_polling",
   "version": "2025.6.10"
 }
 
