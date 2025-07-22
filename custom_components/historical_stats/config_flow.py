@@ -137,6 +137,7 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
         # Copy list so we can edit before saving
         self.points = list(config_entry.options.get("points", []))
         self._current_step = "init"
+        self._edit_index = None
 
     async def async_step_init(self, user_input=None):
         """Show current points and options to add/remove."""
@@ -151,6 +152,7 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
             {
                 vol.Optional("add_point", default=False): bool,
                 vol.Optional("remove_index"): vol.In(choices) if choices else str,
+                vol.Optional("edit_index"): vol.In(choices) if choices else str,
                 vol.Optional("finish", default=True): bool,
             }
         )
@@ -161,6 +163,12 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
                 if 0 <= idx < len(self.points):
                     self.points.pop(idx)
                     return await self.async_step_init()
+            # Handle edit
+            if user_input.get("edit_index") is not None:
+                idx = int(user_input["edit_index"])
+                if 0 <= idx < len(self.points):
+                    self._edit_index = idx
+                    return await self.async_step_edit_point()
             # Handle add
             if user_input.get("add_point"):
                 return await self.async_step_add_point()
@@ -198,6 +206,30 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
                     vol.Required("stat_type", default="value_at"): vol.In(STAT_TYPES),
                     vol.Required("time_unit", default="days"): vol.In(TIME_UNITS),
                     vol.Optional("time_value", default=1): int,
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_edit_point(self, user_input=None):
+        """Edit an existing measurement point."""
+        errors = {}
+        point = self.points[self._edit_index]
+        if user_input is not None:
+            self.points[self._edit_index] = user_input
+            self._edit_index = None
+            return await self.async_step_init()
+        return self.async_show_form(
+            step_id="edit_point",
+            data_schema=vol.Schema(
+                {
+                    vol.Required("stat_type", default=point["stat_type"]): vol.In(
+                        STAT_TYPES
+                    ),
+                    vol.Required(
+                        "time_unit", default=point.get("time_unit", "days")
+                    ): vol.In(TIME_UNITS),
+                    vol.Optional("time_value", default=point.get("time_value", 1)): int,
                 }
             ),
             errors=errors,

@@ -48,8 +48,9 @@ For Home Assistant to recognize the new integration, restart the server.
 
 5. Save and finish.
 
-All statistics for the entity will be available as attributes on a new sensor entity, e.g.  
+All statistics for the entity will be available as attributes on a new sensor entity, e.g.
 `sensor.historical_statistics_sensor_outside_temperature`
+The attribute naming follows `<period>_<statistic>` where the period is `unit_value` like `days_7` or simply `full` for all history. Example: `days_7_min`.
 
 ---
 
@@ -69,7 +70,7 @@ All statistics for the entity will be available as attributes on a new sensor en
 - Period: Days ago
 - Value: 1
 
-2. The result appears as the attribute `value_at_1_days` on your sensor.
+2. The result appears as the attribute `days_1_value_at` on your sensor.
 
 ---
 

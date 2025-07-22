@@ -40,7 +40,8 @@ class HistoricalStatsSensor(SensorEntity):
             stat_type = point["stat_type"]
             unit = point.get("time_unit", "days")
             value = int(point.get("time_value", 1))
-            label = f"{stat_type}_{value}_{unit}"
+            prefix = f"{unit}_{value}" if unit != "all" else "full"
+            label = f"{prefix}_{stat_type}"
 
             try:
                 if unit == "all":
@@ -61,14 +62,24 @@ class HistoricalStatsSensor(SensorEntity):
                             target_time, delta=timedelta(minutes=10)
                         )
                         found = self._find_closest_state(states, target_time)
-                        attrs[label] = found.state if found else STATE_UNKNOWN
+                        if found:
+                            attrs[label] = found.state
+                            attrs[f"{label}_ts"] = found.last_changed.isoformat()
+                            attrs[f"{label}_ts_human"] = dt_util.as_local(
+                                found.last_changed
+                            ).strftime("%Y-%m-%d %H:%M:%S")
+                        else:
+                            attrs[label] = STATE_UNKNOWN
                         continue
 
                     start = now - delta
                     end = now
 
                 states = await self._get_states_interval(start, end)
-                numeric_states = self._states_to_float(states)
+                numeric_states = [
+                    (float(s.state), s) for s in states if self._is_number(s.state)
+                ]
+                values_only = [val for val, _ in numeric_states]
 
                 if not numeric_states:
                     attrs[label] = STATE_UNKNOWN
@@ -77,15 +88,25 @@ class HistoricalStatsSensor(SensorEntity):
                     continue
 
                 if stat_type == "min":
-                    attrs[label] = min(numeric_states)
+                    min_val, min_state = min(numeric_states, key=lambda x: x[0])
+                    attrs[label] = min_val
+                    attrs[f"{label}_ts"] = min_state.last_changed.isoformat()
+                    attrs[f"{label}_ts_human"] = dt_util.as_local(
+                        min_state.last_changed
+                    ).strftime("%Y-%m-%d %H:%M:%S")
                 elif stat_type == "max":
-                    attrs[label] = max(numeric_states)
+                    max_val, max_state = max(numeric_states, key=lambda x: x[0])
+                    attrs[label] = max_val
+                    attrs[f"{label}_ts"] = max_state.last_changed.isoformat()
+                    attrs[f"{label}_ts_human"] = dt_util.as_local(
+                        max_state.last_changed
+                    ).strftime("%Y-%m-%d %H:%M:%S")
                 elif stat_type == "mean":
-                    attrs[label] = sum(numeric_states) / len(numeric_states)
+                    attrs[label] = sum(values_only) / len(values_only)
                 elif stat_type == "total":
                     attrs[label] = (
-                        numeric_states[-1] - numeric_states[0]
-                        if len(numeric_states) >= 2
+                        values_only[-1] - values_only[0]
+                        if len(values_only) >= 2
                         else STATE_UNKNOWN
                     )
                 else:
@@ -118,13 +139,6 @@ class HistoricalStatsSensor(SensorEntity):
                 False,
             )
         )[self._entity_id]
-
-    @staticmethod
-    def _states_to_float(states):
-        """Convert list of state objects to floats, ignore non-numeric."""
-        return [
-            float(s.state) for s in states if HistoricalStatsSensor._is_number(s.state)
-        ]
 
     @staticmethod
     def _is_number(val):
