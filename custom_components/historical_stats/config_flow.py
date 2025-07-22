@@ -9,7 +9,7 @@ from homeassistant.helpers.selector import (
     TextSelector,
 )
 
-from .const import DOMAIN
+from .const import DOMAIN, ERROR_INVALID_COMBINATION
 
 # Available statistic types
 STAT_TYPES = [
@@ -98,9 +98,8 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 any(t in selected_types for t in ["value_at", "total"])
                 and len(selected_types) > 1
             ):
-                errors["stat_types"] = (
-                    "Value at / Total cannot be combined with other types."
-                )
+                # Use translation key for error to support localization
+                errors["stat_types"] = ERROR_INVALID_COMBINATION
             else:
                 for stat_type in selected_types:
                     self.measure_points.append(
