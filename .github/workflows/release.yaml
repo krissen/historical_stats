@@ -17,8 +17,8 @@ jobs:
 
       - name: Create zip
         run: |
-          cd custom_components
-          zip -r historical_stats.zip historical_stats
+          cd custom_components/historical_stats
+          zip historical_stats.zip -r ./
 
       - name: Upload zip to release
         uses: svenstaro/upload-release-action@v1-release
