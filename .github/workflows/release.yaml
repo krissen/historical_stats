@@ -17,9 +17,6 @@ jobs:
 
       - name: Create zip
         run: |
-          pwd
-          ls
-          ls custom_components
           cd custom_components/historical_stats
           zip historical_stats.zip -r ./
 
@@ -27,7 +24,7 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./custom_components/historical_stats.zip
+          file: ./custom_components/historical_stats/historical_stats.zip
           asset_name: historical_stats.zip
           tag: ${{ github.ref_name }}
           overwrite: true
