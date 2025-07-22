@@ -44,7 +44,7 @@ class HistoricalStatsSensor(SensorEntity):
 
             try:
                 if unit == "all":
-                    start = None
+                    start = dt_util.utc_from_timestamp(0)
                     end = now
                 else:
                     delta = {
