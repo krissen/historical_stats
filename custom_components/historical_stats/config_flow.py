@@ -59,6 +59,7 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Optional("update_interval", default=30): NumberSelector(
                         {"min": 1, "max": 1440, "unit_of_measurement": "min"}
                     ),
+                    vol.Optional("friendly_name"): str,
                 }
             ),
             errors=errors,
@@ -93,8 +94,12 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     return await self.async_step_add_point()
                 entry_data = dict(self.data)
                 entry_options = {"points": self.measure_points}
+                friendly_name = entry_data.get("friendly_name")
+                if not friendly_name:
+                    state = self.hass.states.get(entry_data["entity_id"])
+                    friendly_name = state.name if state else entry_data["entity_id"]
                 return self.async_create_entry(
-                    title=f"Historical statistics: {self.data['entity_id']}",
+                    title=f"Historical statistics: {friendly_name}",
                     data=entry_data,
                     options=entry_options,
                 )
@@ -148,23 +153,33 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
             f"{i + 1}: {point['stat_type']} {point.get('time_value', '')} {point.get('time_unit', '')}"
             for i, point in enumerate(self.points)
         ]
-        choices = {str(i): lbl for i, lbl in enumerate(point_labels)}
-        # Actions: add, remove, finish
+        choices = [
+            {"value": str(i), "label": lbl} for i, lbl in enumerate(point_labels)
+        ]
         schema = vol.Schema(
             {
                 vol.Optional("add_point", default=False): bool,
-                vol.Optional("remove_index"): vol.In(choices) if choices else str,
-                vol.Optional("edit_index"): vol.In(choices) if choices else str,
+                vol.Optional("remove_indices", default=[]): SelectSelector(
+                    {"options": choices, "multiple": True, "mode": "list"}
+                )
+                if choices
+                else [],
+                vol.Optional("edit_index"): SelectSelector(
+                    {"options": choices, "multiple": False}
+                )
+                if choices
+                else str,
                 vol.Optional("finish", default=True): bool,
             }
         )
         if user_input:
-            # Handle remove
-            if user_input.get("remove_index") is not None:
-                idx = int(user_input["remove_index"])
-                if 0 <= idx < len(self.points):
-                    self.points.pop(idx)
-                    return await self.async_step_init()
+            # Handle remove (can remove multiple indices)
+            if user_input.get("remove_indices"):
+                for idx_str in sorted(user_input["remove_indices"], reverse=True):
+                    idx = int(idx_str)
+                    if 0 <= idx < len(self.points):
+                        self.points.pop(idx)
+                return await self.async_step_init()
             # Handle edit
             if user_input.get("edit_index") is not None:
                 idx = int(user_input["edit_index"])
@@ -177,9 +192,7 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
             # Done
             if user_input.get("finish"):
                 return self.async_create_entry(
-                    title=self.config_entry.title,
-                    data=self.config_entry.data,
-                    options={"points": self.points},
+                    title=self.config_entry.title, data={"points": self.points}
                 )
 
         return self.async_show_form(

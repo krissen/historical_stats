@@ -6,7 +6,8 @@
                 "description": "Select the source entity and update interval.",
                 "data": {
                     "entity_id": "Entity",
-                    "update_interval": "Update interval (minutes)"
+                    "update_interval": "Update interval (minutes)",
+                    "friendly_name": "Custom name"
                 }
             },
             "add_point": {
@@ -29,8 +30,8 @@
                 "description": "{current_points}",
                 "data": {
                     "add_point": "Add point",
-                    "remove_index": "Remove index",
-                    "edit_index": "Edit index",
+                    "remove_indices": "Remove points",
+                    "edit_index": "Edit point",
                     "finish": "Finish"
                 }
             },
