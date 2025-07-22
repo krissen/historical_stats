@@ -8,7 +8,7 @@ This project is a Home Assistant custom integration that provides flexible, conf
 
 ### Directory and File Handling
 
-- In the `custom_components/historical-stats/translations/` directory, only process the `en.json` file. All other files in this directory must be ignored.
+- In the `custom_components/historical_stats/translations/` directory, only process the `en.json` file. All other files in this directory must be ignored.
 
 ### Coding Principles
 

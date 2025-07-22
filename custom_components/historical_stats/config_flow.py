@@ -8,7 +8,7 @@ from homeassistant.helpers.selector import (
 
 from .const import DOMAIN
 
-# Tillgängliga statistiktyper
+# Available statistic types
 STAT_TYPES = [
     "value_at",
     "min",
@@ -44,7 +44,7 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         errors = {}
         if user_input is not None:
-            # Unik per entity
+            # Unique per entity
             await self.async_set_unique_id(user_input["entity_id"])
             self._abort_if_unique_id_configured()
             self.data = user_input
