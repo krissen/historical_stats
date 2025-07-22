@@ -12,9 +12,17 @@ from homeassistant.util import slugify
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
+    """Set up a HistoricalStatsSensor from a config entry."""
     entity_id = entry.data["entity_id"]
     points = entry.options.get("points", [])
-    name = f"Historical statistics {entity_id}"
+    friendly_name = entry.data.get("friendly_name")
+
+    if not friendly_name:
+        state = hass.states.get(entity_id)
+        friendly_name = state.name if state else entity_id
+
+    name = f"Historical statistics for {friendly_name}"
+
     async_add_entities(
         [HistoricalStatsSensor(hass, name, entity_id, points)], update_before_add=True
     )
@@ -32,6 +40,11 @@ class HistoricalStatsSensor(SensorEntity):
         self._points = points
         self._attr_native_value = STATE_UNKNOWN
         self._attr_extra_state_attributes = {}
+
+    @property
+    def suggested_object_id(self):
+        """Return stable entity id based on source entity."""
+        return f"historical_stats_{slugify(self._entity_id)}"
 
     async def async_update(self):
         """Fetch and calculate statistics for each point."""
