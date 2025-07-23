@@ -18,7 +18,7 @@ TRANSLATIONS = json.load(
 )
 
 # Available statistic types and time units (labels defined in en.json)
-STAT_TYPES = ["value_at", "min", "max", "mean", "total"]
+STAT_TYPES = ["value_at", "min", "max", "mean", "total", "sum"]
 STAT_TYPE_LABELS = TRANSLATIONS.get("stat_type", {})
 TIME_UNITS = TRANSLATIONS.get("time_unit", {})
 
@@ -59,37 +59,32 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             selected_types = user_input["stat_types"]
             time_unit = user_input["time_unit"]
             time_value = user_input.get("time_value", 1)
+            time_unit_to = user_input.get("time_unit_to")
+            time_value_to = user_input.get("time_value_to")
 
-            # Special case: if value_at or total is selected, only one allowed
-            if (
-                any(t in selected_types for t in ["value_at", "total"])
-                and len(selected_types) > 1
-            ):
-                errors["stat_types"] = (
-                    "Value at / Total cannot be combined with other types."
+            for stat_type in selected_types:
+                self.measure_points.append(
+                    {
+                        "stat_type": stat_type,
+                        "time_unit": time_unit,
+                        "time_value": time_value,
+                        "time_unit_to": time_unit_to,
+                        "time_value_to": time_value_to,
+                    }
                 )
-            else:
-                for stat_type in selected_types:
-                    self.measure_points.append(
-                        {
-                            "stat_type": stat_type,
-                            "time_unit": time_unit,
-                            "time_value": time_value,
-                        }
-                    )
-                if user_input.get("add_another", False):
-                    return await self.async_step_add_point()
-                entry_data = dict(self.data)
-                entry_options = {"points": self.measure_points}
-                friendly_name = entry_data.get("friendly_name")
-                if not friendly_name:
-                    state = self.hass.states.get(entry_data["entity_id"])
-                    friendly_name = state.name if state else entry_data["entity_id"]
-                return self.async_create_entry(
-                    title=f"Historical statistics: {friendly_name}",
-                    data=entry_data,
-                    options=entry_options,
-                )
+            if user_input.get("add_another", False):
+                return await self.async_step_add_point()
+            entry_data = dict(self.data)
+            entry_options = {"points": self.measure_points}
+            friendly_name = entry_data.get("friendly_name")
+            if not friendly_name:
+                state = self.hass.states.get(entry_data["entity_id"])
+                friendly_name = state.name if state else entry_data["entity_id"]
+            return self.async_create_entry(
+                title=f"Historical statistics: {friendly_name}",
+                data=entry_data,
+                options=entry_options,
+            )
 
         # Use SelectSelector for proper multi-select in the HA UI
         return self.async_show_form(
@@ -115,14 +110,20 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         }
                     ),
                     vol.Optional("time_value", default=1): int,
+                    vol.Optional("time_unit_to"): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": TIME_UNITS[v]} for v in TIME_UNITS
+                            ],
+                            "mode": "dropdown",
+                        }
+                    ),
+                    vol.Optional("time_value_to", default=0): int,
                     vol.Optional("add_another", default=False): bool,
                 }
             ),
             description_placeholders={
-                "info": (
-                    "Select one or more statistics for this period. "
-                    "Note: 'Value at' and 'Total change' cannot be combined with others."
-                )
+                "info": "Select one or more statistics for this period."
             },
             errors=errors,
         )
@@ -222,6 +223,15 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
                         }
                     ),
                     vol.Optional("time_value", default=1): int,
+                    vol.Optional("time_unit_to"): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": TIME_UNITS[v]} for v in TIME_UNITS
+                            ],
+                            "mode": "dropdown",
+                        }
+                    ),
+                    vol.Optional("time_value_to", default=0): int,
                 }
             ),
             errors=errors,
@@ -253,6 +263,17 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
                         }
                     ),
                     vol.Optional("time_value", default=point.get("time_value", 1)): int,
+                    vol.Optional("time_unit_to"): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": TIME_UNITS[v]} for v in TIME_UNITS
+                            ],
+                            "mode": "dropdown",
+                        }
+                    ),
+                    vol.Optional(
+                        "time_value_to", default=point.get("time_value_to", 0)
+                    ): int,
                 }
             ),
             errors=errors,

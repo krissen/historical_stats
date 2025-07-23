@@ -15,8 +15,10 @@
                 "description": "{info}",
                 "data": {
                     "stat_types": "Statistics types",
-                    "time_unit": "Time unit",
-                    "time_value": "Time value",
+                    "time_unit": "Time unit (from)",
+                    "time_value": "Time value (from)",
+                    "time_unit_to": "Time unit (to)",
+                    "time_value_to": "Time value (to)",
                     "add_another": "Add another"
                 }
             }
@@ -40,8 +42,10 @@
                 "description": "Set the parameters for the measurement point.",
                 "data": {
                     "stat_type": "Statistic type",
-                    "time_unit": "Time unit",
-                    "time_value": "Time value"
+                    "time_unit": "Time unit (from)",
+                    "time_value": "Time value (from)",
+                    "time_unit_to": "Time unit (to)",
+                    "time_value_to": "Time value (to)"
                 }
             },
             "edit_point": {
@@ -49,8 +53,10 @@
                 "description": "Update the parameters for the measurement point.",
                 "data": {
                     "stat_type": "Statistic type",
-                    "time_unit": "Time unit",
-                    "time_value": "Time value"
+                    "time_unit": "Time unit (from)",
+                    "time_value": "Time value (from)",
+                    "time_unit_to": "Time unit (to)",
+                    "time_value_to": "Time value (to)"
                 }
             }
         }
@@ -60,7 +66,8 @@
         "min": "Minimum",
         "max": "Maximum",
         "mean": "Mean",
-        "total": "Total change"
+        "total": "Total change",
+        "sum": "Sum"
     },
     "time_unit": {
         "minutes": "Minutes ago",
