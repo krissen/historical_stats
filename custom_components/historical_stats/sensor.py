@@ -76,6 +76,18 @@ class HistoricalStatsSensor(SensorEntity):
         """Return stable entity id based on source entity."""
         return f"historical_stats_{slugify(self._entity_id)}"
 
+    @staticmethod
+    def _delta_from_unit(unit, value):
+        """Return timedelta or relativedelta for a unit."""
+        return {
+            "minutes": timedelta(minutes=value),
+            "hours": timedelta(hours=value),
+            "days": timedelta(days=value),
+            "weeks": timedelta(weeks=value),
+            "months": relativedelta(months=value),
+            "years": relativedelta(years=value),
+        }.get(unit, timedelta(days=value))
+
     async def async_update(self):
         """Fetch and calculate statistics for each point."""
         now = dt_util.utcnow()
@@ -87,53 +99,40 @@ class HistoricalStatsSensor(SensorEntity):
             stat_type = point["stat_type"]
             unit = point.get("time_unit", "days")
             value = int(point.get("time_value", 1))
-            prefix = f"{unit}_{value}" if unit != "all" else "full"
+            unit_to = point.get("time_unit_to")
+            value_to = int(point.get("time_value_to", 0))
+
+            from_prefix = "full" if unit == "all" else f"{unit}_{value}"
+            if unit_to:
+                to_prefix = "full" if unit_to == "all" else f"{unit_to}_{value_to}"
+                prefix = f"{from_prefix}_to_{to_prefix}"
+            else:
+                prefix = from_prefix
             label = f"{prefix}_{stat_type}"
 
             try:
                 if unit == "all":
                     start = HA_START
-                    end = now
-                    delta = end - start
                 else:
-                    if unit == "years":
-                        start = now.replace(
-                            month=1,
-                            day=1,
-                            hour=0,
-                            minute=0,
-                            second=0,
-                            microsecond=0,
-                        )
-                        end = now
-                        delta = end - start
+                    start = now - self._delta_from_unit(unit, value)
+
+                end = now - self._delta_from_unit(unit_to, value_to) if unit_to else now
+
+                if stat_type == "value_at":
+                    target_time = start
+                    states = await self._get_states_around(
+                        target_time, delta=timedelta(minutes=10)
+                    )
+                    found = self._find_closest_state(states, target_time)
+                    if found:
+                        attrs[label] = found.state
+                        attrs[f"{label}_ts"] = found.last_changed.isoformat()
+                        attrs[f"{label}_ts_human"] = dt_util.as_local(
+                            found.last_changed
+                        ).strftime("%Y-%m-%d %H:%M:%S")
                     else:
-                        delta = {
-                            "minutes": timedelta(minutes=value),
-                            "hours": timedelta(hours=value),
-                            "days": timedelta(days=value),
-                            "weeks": timedelta(weeks=value),
-                            "months": relativedelta(months=value),
-                        }.get(unit, timedelta(days=value))
-
-                        start = now - delta
-                        end = now
-
-                    if stat_type == "value_at":
-                        target_time = start if unit in ("years", "all") else now - delta
-                        states = await self._get_states_around(
-                            target_time, delta=timedelta(minutes=10)
-                        )
-                        found = self._find_closest_state(states, target_time)
-                        if found:
-                            attrs[label] = found.state
-                            attrs[f"{label}_ts"] = found.last_changed.isoformat()
-                            attrs[f"{label}_ts_human"] = dt_util.as_local(
-                                found.last_changed
-                            ).strftime("%Y-%m-%d %H:%M:%S")
-                        else:
-                            attrs[label] = STATE_UNKNOWN
-                        continue
+                        attrs[label] = STATE_UNKNOWN
+                    continue
 
                 states = await self._get_states_interval(start, end)
                 numeric_states = [
@@ -176,6 +175,8 @@ class HistoricalStatsSensor(SensorEntity):
                         if len(values_only) >= 2
                         else STATE_UNKNOWN
                     )
+                elif stat_type == "sum":
+                    attrs[label] = sum(values_only)
                 else:
                     attrs[label] = STATE_UNKNOWN
             except Exception:

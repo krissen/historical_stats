@@ -17,7 +17,9 @@
           "stat_types": "Statistikarten",
           "time_unit": "Zeiteinheit",
           "time_value": "Zeitwert",
-          "add_another": "Weiteren hinzufügen"
+          "add_another": "Weiteren hinzufügen",
+          "time_unit_to": "Zeiteinheit (bis)",
+          "time_value_to": "Zeitwert (bis)"
         }
       }
     }
@@ -39,8 +41,10 @@
         "description": "Stellen Sie die Parameter für den Messpunkt ein.",
         "data": {
           "stat_type": "Statistikart",
-          "time_unit": "Zeiteinheit",
-          "time_value": "Zeitwert"
+          "time_unit": "Zeiteinheit (von)",
+          "time_value": "Zeitwert (von)",
+          "time_unit_to": "Zeiteinheit (bis)",
+          "time_value_to": "Zeitwert (bis)"
         }
       },
       "edit_point": {
@@ -48,8 +52,10 @@
         "description": "Aktualisieren Sie die Parameter für den Messpunkt.",
         "data": {
           "stat_type": "Statistikart",
-          "time_unit": "Zeiteinheit",
-          "time_value": "Zeitwert"
+          "time_unit": "Zeiteinheit (von)",
+          "time_value": "Zeitwert (von)",
+          "time_unit_to": "Zeiteinheit (bis)",
+          "time_value_to": "Zeitwert (bis)"
         }
       }
     }
@@ -59,7 +65,8 @@
     "min": "Minimum",
     "max": "Maximum",
     "mean": "Mittelwert",
-    "total": "Gesamtänderung"
+    "total": "Gesamtänderung",
+    "sum": "Summe"
   },
   "time_unit": {
     "minutes": "Vor Minuten",

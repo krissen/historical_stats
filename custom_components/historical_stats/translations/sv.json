@@ -17,7 +17,9 @@
           "stat_types": "Statistiktyp(er)",
           "time_unit": "Tidsenhet",
           "time_value": "Tidsvärde",
-          "add_another": "Lägg till en till"
+          "add_another": "Lägg till en till",
+          "time_unit_to": "Tidsenhet (till)",
+          "time_value_to": "Tidsvärde (till)"
         }
       }
     }
@@ -39,8 +41,10 @@
         "description": "Ställ in parametrar för mätpunkten.",
         "data": {
           "stat_type": "Statistiktyp",
-          "time_unit": "Tidsenhet",
-          "time_value": "Tidsvärde"
+          "time_unit": "Tidsenhet (från)",
+          "time_value": "Tidsvärde (från)",
+          "time_unit_to": "Tidsenhet (till)",
+          "time_value_to": "Tidsvärde (till)"
         }
       },
       "edit_point": {
@@ -48,8 +52,10 @@
         "description": "Uppdatera parametrarna för mätpunkten.",
         "data": {
           "stat_type": "Statistiktyp",
-          "time_unit": "Tidsenhet",
-          "time_value": "Tidsvärde"
+          "time_unit": "Tidsenhet (från)",
+          "time_value": "Tidsvärde (från)",
+          "time_unit_to": "Tidsenhet (till)",
+          "time_value_to": "Tidsvärde (till)"
         }
       }
     }
@@ -59,7 +65,8 @@
     "min": "Minsta",
     "max": "Högsta",
     "mean": "Medelvärde",
-    "total": "Total förändring"
+    "total": "Total förändring",
+    "sum": "Summa"
   },
   "time_unit": {
     "minutes": "Minuter sedan",
