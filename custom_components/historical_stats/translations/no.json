@@ -17,7 +17,9 @@
           "stat_types": "Statistikktype(r)",
           "time_unit": "Tidsenhet",
           "time_value": "Tidsverdi",
-          "add_another": "Legg til en til"
+          "add_another": "Legg til en til",
+          "time_unit_to": "Tidsenhet (til)",
+          "time_value_to": "Tidsverdi (til)"
         }
       }
     }
@@ -39,8 +41,10 @@
         "description": "Angi parametere for målepunktet.",
         "data": {
           "stat_type": "Statistikktype",
-          "time_unit": "Tidsenhet",
-          "time_value": "Tidsverdi"
+          "time_unit": "Tidsenhet (fra)",
+          "time_value": "Tidsverdi (fra)",
+          "time_unit_to": "Tidsenhet (til)",
+          "time_value_to": "Tidsverdi (til)"
         }
       },
       "edit_point": {
@@ -48,8 +52,10 @@
         "description": "Oppdater parametere for målepunktet.",
         "data": {
           "stat_type": "Statistikktype",
-          "time_unit": "Tidsenhet",
-          "time_value": "Tidsverdi"
+          "time_unit": "Tidsenhet (fra)",
+          "time_value": "Tidsverdi (fra)",
+          "time_unit_to": "Tidsenhet (til)",
+          "time_value_to": "Tidsverdi (til)"
         }
       }
     }
@@ -59,7 +65,8 @@
     "min": "Minimum",
     "max": "Maksimum",
     "mean": "Gjennomsnitt",
-    "total": "Total endring"
+    "total": "Total endring",
+    "sum": "Sum"
   },
   "time_unit": {
     "minutes": "Minutter siden",

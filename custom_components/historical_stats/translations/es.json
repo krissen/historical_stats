@@ -17,7 +17,9 @@
           "stat_types": "Tipos de estadísticas",
           "time_unit": "Unidad de tiempo",
           "time_value": "Valor de tiempo",
-          "add_another": "Agregar otro"
+          "add_another": "Agregar otro",
+          "time_unit_to": "Unidad de tiempo (hasta)",
+          "time_value_to": "Valor de tiempo (hasta)"
         }
       }
     }
@@ -39,8 +41,10 @@
         "description": "Establecer los parámetros del punto de medición.",
         "data": {
           "stat_type": "Tipo de estadística",
-          "time_unit": "Unidad de tiempo",
-          "time_value": "Valor de tiempo"
+          "time_unit": "Unidad de tiempo (desde)",
+          "time_value": "Valor de tiempo (desde)",
+          "time_unit_to": "Unidad de tiempo (hasta)",
+          "time_value_to": "Valor de tiempo (hasta)"
         }
       },
       "edit_point": {
@@ -48,8 +52,10 @@
         "description": "Actualice los parámetros del punto de medición.",
         "data": {
           "stat_type": "Tipo de estadística",
-          "time_unit": "Unidad de tiempo",
-          "time_value": "Valor de tiempo"
+          "time_unit": "Unidad de tiempo (desde)",
+          "time_value": "Valor de tiempo (desde)",
+          "time_unit_to": "Unidad de tiempo (hasta)",
+          "time_value_to": "Valor de tiempo (hasta)"
         }
       }
     }
@@ -59,7 +65,8 @@
     "min": "Mínimo",
     "max": "Máximo",
     "mean": "Promedio",
-    "total": "Cambio total"
+    "total": "Cambio total",
+    "sum": "Suma"
   },
   "time_unit": {
     "minutes": "Hace minutos",

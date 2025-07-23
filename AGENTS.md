@@ -13,8 +13,11 @@ This project is a Home Assistant custom integration that provides flexible, conf
 ### Coding Principles
 
 - All code must follow the KISS (Keep It Simple, Stupid) and DRY (Don't Repeat Yourself) principles.
+- If the task at hand involves several distinct steps, said steps must be added to the codebase in separate commits.
+- Code must be aligned with the latest documentation and guidelines of the Home Assistant project.
+- Commit messages must be clear and descriptive, following the format: `feat: <description>` for new features, `fix: <description>` for bug fixes, and `docs: <description>` for documentation changes.
 
 ### Comments and Documentation
 
-- All code should be commented for clarity.
+- All code must be commented for clarity.
 - All documentation, including comments, must be written in English.

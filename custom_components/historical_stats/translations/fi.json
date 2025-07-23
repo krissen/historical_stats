@@ -17,7 +17,9 @@
           "stat_types": "Tilastotyypit",
           "time_unit": "Aikayksikkö",
           "time_value": "Aika-arvo",
-          "add_another": "Lisää toinen"
+          "add_another": "Lisää toinen",
+          "time_unit_to": "Aikayksikkö (loppu)",
+          "time_value_to": "Aika-arvo (loppu)"
         }
       }
     }
@@ -39,8 +41,10 @@
         "description": "Aseta mittauspisteen parametrit.",
         "data": {
           "stat_type": "Tilastotyyppi",
-          "time_unit": "Aikayksikkö",
-          "time_value": "Aika-arvo"
+          "time_unit": "Aikayksikkö (alku)",
+          "time_value": "Aika-arvo (alku)",
+          "time_unit_to": "Aikayksikkö (loppu)",
+          "time_value_to": "Aika-arvo (loppu)"
         }
       },
       "edit_point": {
@@ -48,8 +52,10 @@
         "description": "Päivitä mittauspisteen parametrit.",
         "data": {
           "stat_type": "Tilastotyyppi",
-          "time_unit": "Aikayksikkö",
-          "time_value": "Aika-arvo"
+          "time_unit": "Aikayksikkö (alku)",
+          "time_value": "Aika-arvo (alku)",
+          "time_unit_to": "Aikayksikkö (loppu)",
+          "time_value_to": "Aika-arvo (loppu)"
         }
       }
     }
@@ -59,7 +65,8 @@
     "min": "Minimi",
     "max": "Maksimi",
     "mean": "Keskiarvo",
-    "total": "Kokonaissmuutos"
+    "total": "Kokonaissmuutos",
+    "sum": "Summa"
   },
   "time_unit": {
     "minutes": "Minuuttia sitten",

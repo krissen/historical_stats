@@ -1,8 +1,5 @@
 """Config flow for the Historical statistics integration."""
 
-import json
-from pathlib import Path
-
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.helpers.selector import (
@@ -10,17 +7,12 @@ from homeassistant.helpers.selector import (
     NumberSelector,
     SelectSelector,
 )
+from homeassistant.helpers import translation
 
 from .const import DOMAIN
 
-TRANSLATIONS = json.load(
-    open(Path(__file__).parent / "translations" / "en.json", encoding="utf-8")
-)
-
-# Available statistic types and time units (labels defined in en.json)
-STAT_TYPES = ["value_at", "min", "max", "mean", "total"]
-STAT_TYPE_LABELS = TRANSLATIONS.get("stat_type", {})
-TIME_UNITS = TRANSLATIONS.get("time_unit", {})
+# Available statistic types
+STAT_TYPES = ["value_at", "min", "max", "mean", "total", "sum"]
 
 
 class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -29,6 +21,28 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self):
         self.data = {}
         self.measure_points = []
+        self.stat_type_labels = {}
+        self.time_units = {}
+        self._translations_loaded = False
+
+    async def _async_setup_translations(self):
+        """Load translations based on the configured language."""
+        if self._translations_loaded:
+            return
+        lang = self.hass.config.language
+        stat_type_strings = await translation.async_get_translations(
+            self.hass, lang, "stat_type", integrations=[DOMAIN]
+        )
+        time_unit_strings = await translation.async_get_translations(
+            self.hass, lang, "time_unit", integrations=[DOMAIN]
+        )
+        self.stat_type_labels = {
+            key.split(".")[-1]: value for key, value in stat_type_strings.items()
+        }
+        self.time_units = {
+            key.split(".")[-1]: value for key, value in time_unit_strings.items()
+        }
+        self._translations_loaded = True
 
     async def async_step_user(self, user_input=None):
         errors = {}
@@ -55,41 +69,37 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_add_point(self, user_input=None):
         """Add a new measurement point, allowing multiselect for stat_types."""
         errors = {}
+        await self._async_setup_translations()
         if user_input is not None:
             selected_types = user_input["stat_types"]
             time_unit = user_input["time_unit"]
             time_value = user_input.get("time_value", 1)
+            time_unit_to = user_input.get("time_unit_to")
+            time_value_to = user_input.get("time_value_to")
 
-            # Special case: if value_at or total is selected, only one allowed
-            if (
-                any(t in selected_types for t in ["value_at", "total"])
-                and len(selected_types) > 1
-            ):
-                errors["stat_types"] = (
-                    "Value at / Total cannot be combined with other types."
+            for stat_type in selected_types:
+                self.measure_points.append(
+                    {
+                        "stat_type": stat_type,
+                        "time_unit": time_unit,
+                        "time_value": time_value,
+                        "time_unit_to": time_unit_to,
+                        "time_value_to": time_value_to,
+                    }
                 )
-            else:
-                for stat_type in selected_types:
-                    self.measure_points.append(
-                        {
-                            "stat_type": stat_type,
-                            "time_unit": time_unit,
-                            "time_value": time_value,
-                        }
-                    )
-                if user_input.get("add_another", False):
-                    return await self.async_step_add_point()
-                entry_data = dict(self.data)
-                entry_options = {"points": self.measure_points}
-                friendly_name = entry_data.get("friendly_name")
-                if not friendly_name:
-                    state = self.hass.states.get(entry_data["entity_id"])
-                    friendly_name = state.name if state else entry_data["entity_id"]
-                return self.async_create_entry(
-                    title=f"Historical statistics: {friendly_name}",
-                    data=entry_data,
-                    options=entry_options,
-                )
+            if user_input.get("add_another", False):
+                return await self.async_step_add_point()
+            entry_data = dict(self.data)
+            entry_options = {"points": self.measure_points}
+            friendly_name = entry_data.get("friendly_name")
+            if not friendly_name:
+                state = self.hass.states.get(entry_data["entity_id"])
+                friendly_name = state.name if state else entry_data["entity_id"]
+            return self.async_create_entry(
+                title=f"Historical statistics: {friendly_name}",
+                data=entry_data,
+                options=entry_options,
+            )
 
         # Use SelectSelector for proper multi-select in the HA UI
         return self.async_show_form(
@@ -99,7 +109,7 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required("stat_types", default=["min", "max"]): SelectSelector(
                         {
                             "options": [
-                                {"value": v, "label": STAT_TYPE_LABELS[v]}
+                                {"value": v, "label": self.stat_type_labels[v]}
                                 for v in STAT_TYPES
                             ],
                             "multiple": True,
@@ -109,20 +119,28 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required("time_unit", default="days"): SelectSelector(
                         {
                             "options": [
-                                {"value": v, "label": TIME_UNITS[v]} for v in TIME_UNITS
+                                {"value": v, "label": self.time_units[v]}
+                                for v in self.time_units
                             ],
                             "mode": "dropdown",
                         }
                     ),
                     vol.Optional("time_value", default=1): int,
+                    vol.Optional("time_unit_to"): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": self.time_units[v]}
+                                for v in self.time_units
+                            ],
+                            "mode": "dropdown",
+                        }
+                    ),
+                    vol.Optional("time_value_to", default=0): int,
                     vol.Optional("add_another", default=False): bool,
                 }
             ),
             description_placeholders={
-                "info": (
-                    "Select one or more statistics for this period. "
-                    "Note: 'Value at' and 'Total change' cannot be combined with others."
-                )
+                "info": "Select one or more statistics for this period."
             },
             errors=errors,
         )
@@ -139,10 +157,33 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
         self.points = list(config_entry.options.get("points", []))
         self._current_step = "init"
         self._edit_index = None
+        self.stat_type_labels = {}
+        self.time_units = {}
+        self._translations_loaded = False
+
+    async def _async_setup_translations(self):
+        """Load translations based on the configured language."""
+        if self._translations_loaded:
+            return
+        lang = self.config_entry.hass.config.language
+        stat_type_strings = await translation.async_get_translations(
+            self.config_entry.hass, lang, "stat_type", integrations=[DOMAIN]
+        )
+        time_unit_strings = await translation.async_get_translations(
+            self.config_entry.hass, lang, "time_unit", integrations=[DOMAIN]
+        )
+        self.stat_type_labels = {
+            key.split(".")[-1]: value for key, value in stat_type_strings.items()
+        }
+        self.time_units = {
+            key.split(".")[-1]: value for key, value in time_unit_strings.items()
+        }
+        self._translations_loaded = True
 
     async def async_step_init(self, user_input=None):
         """Show current points and options to add/remove."""
         errors = {}
+        await self._async_setup_translations()
         point_labels = [
             f"{i + 1}: {point['stat_type']} {point.get('time_value', '')} {point.get('time_unit', '')}"
             for i, point in enumerate(self.points)
@@ -205,6 +246,7 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
     async def async_step_add_point(self, user_input=None):
         """Add new measurement point."""
         errors = {}
+        await self._async_setup_translations()
         if user_input is not None:
             self.points.append(user_input)
             return await self.async_step_init()
@@ -212,16 +254,35 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
             step_id="add_point",
             data_schema=vol.Schema(
                 {
-                    vol.Required("stat_type", default="value_at"): vol.In(STAT_TYPES),
+                    vol.Required("stat_type", default="value_at"): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": self.stat_type_labels[v]}
+                                for v in STAT_TYPES
+                            ],
+                            "mode": "dropdown",
+                        }
+                    ),
                     vol.Required("time_unit", default="days"): SelectSelector(
                         {
                             "options": [
-                                {"value": v, "label": TIME_UNITS[v]} for v in TIME_UNITS
+                                {"value": v, "label": self.time_units[v]}
+                                for v in self.time_units
                             ],
                             "mode": "dropdown",
                         }
                     ),
                     vol.Optional("time_value", default=1): int,
+                    vol.Optional("time_unit_to"): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": self.time_units[v]}
+                                for v in self.time_units
+                            ],
+                            "mode": "dropdown",
+                        }
+                    ),
+                    vol.Optional("time_value_to", default=0): int,
                 }
             ),
             errors=errors,
@@ -230,6 +291,7 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
     async def async_step_edit_point(self, user_input=None):
         """Edit an existing measurement point."""
         errors = {}
+        await self._async_setup_translations()
         point = self.points[self._edit_index]
         if user_input is not None:
             self.points[self._edit_index] = user_input
@@ -239,20 +301,41 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
             step_id="edit_point",
             data_schema=vol.Schema(
                 {
-                    vol.Required("stat_type", default=point["stat_type"]): vol.In(
-                        STAT_TYPES
+                    vol.Required(
+                        "stat_type", default=point["stat_type"]
+                    ): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": self.stat_type_labels[v]}
+                                for v in STAT_TYPES
+                            ],
+                            "mode": "dropdown",
+                        }
                     ),
                     vol.Required(
                         "time_unit", default=point.get("time_unit", "days")
                     ): SelectSelector(
                         {
                             "options": [
-                                {"value": v, "label": TIME_UNITS[v]} for v in TIME_UNITS
+                                {"value": v, "label": self.time_units[v]}
+                                for v in self.time_units
                             ],
                             "mode": "dropdown",
                         }
                     ),
                     vol.Optional("time_value", default=point.get("time_value", 1)): int,
+                    vol.Optional("time_unit_to"): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": self.time_units[v]}
+                                for v in self.time_units
+                            ],
+                            "mode": "dropdown",
+                        }
+                    ),
+                    vol.Optional(
+                        "time_value_to", default=point.get("time_value_to", 0)
+                    ): int,
                 }
             ),
             errors=errors,
