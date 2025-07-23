@@ -1,5 +1,8 @@
 """Config flow for the Historical statistics integration."""
 
+import json
+from pathlib import Path
+
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.helpers.selector import (
@@ -10,30 +13,14 @@ from homeassistant.helpers.selector import (
 
 from .const import DOMAIN
 
-# Available statistic types
-STAT_TYPES = [
-    "value_at",
-    "min",
-    "max",
-    "mean",
-    "total",
-]
-STAT_TYPE_LABELS = {
-    "value_at": "Value at",
-    "min": "Minimum",
-    "max": "Maximum",
-    "mean": "Mean",
-    "total": "Total change",
-}
+TRANSLATIONS = json.load(
+    open(Path(__file__).parent / "translations" / "en.json", encoding="utf-8")
+)
 
-TIME_UNITS = {
-    "minutes": "Minutes ago",
-    "hours": "Hours ago",
-    "days": "Days ago",
-    "weeks": "Weeks ago",
-    "months": "Months ago",
-    "all": "All history",
-}
+# Available statistic types and time units (labels defined in en.json)
+STAT_TYPES = ["value_at", "min", "max", "mean", "total"]
+STAT_TYPE_LABELS = TRANSLATIONS.get("stat_type", {})
+TIME_UNITS = TRANSLATIONS.get("time_unit", {})
 
 
 class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -119,7 +106,14 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             "mode": "dropdown",
                         }
                     ),
-                    vol.Required("time_unit", default="days"): vol.In(TIME_UNITS),
+                    vol.Required("time_unit", default="days"): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": TIME_UNITS[v]} for v in TIME_UNITS
+                            ],
+                            "mode": "dropdown",
+                        }
+                    ),
                     vol.Optional("time_value", default=1): int,
                     vol.Optional("add_another", default=False): bool,
                 }
@@ -219,7 +213,14 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Required("stat_type", default="value_at"): vol.In(STAT_TYPES),
-                    vol.Required("time_unit", default="days"): vol.In(TIME_UNITS),
+                    vol.Required("time_unit", default="days"): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": TIME_UNITS[v]} for v in TIME_UNITS
+                            ],
+                            "mode": "dropdown",
+                        }
+                    ),
                     vol.Optional("time_value", default=1): int,
                 }
             ),
@@ -243,7 +244,14 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
                     ),
                     vol.Required(
                         "time_unit", default=point.get("time_unit", "days")
-                    ): vol.In(TIME_UNITS),
+                    ): SelectSelector(
+                        {
+                            "options": [
+                                {"value": v, "label": TIME_UNITS[v]} for v in TIME_UNITS
+                            ],
+                            "mode": "dropdown",
+                        }
+                    ),
                     vol.Optional("time_value", default=point.get("time_value", 1)): int,
                 }
             ),

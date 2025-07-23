@@ -1,6 +1,8 @@
 """Sensor platform providing configurable historical statistics."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
+from dateutil.relativedelta import relativedelta
+from homeassistant.components.recorder.statistics import statistics_during_period
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.recorder.history import get_significant_states
@@ -10,6 +12,9 @@ from homeassistant.helpers.event import async_track_time_interval
 
 from .const import STATE_ERROR, STATE_NO_DATA, STATE_OK
 from homeassistant.util import slugify
+
+# Earliest possible date for "all history" calculations.
+HA_START = datetime(2013, 11, 1, tzinfo=timezone.utc)
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -87,19 +92,35 @@ class HistoricalStatsSensor(SensorEntity):
 
             try:
                 if unit == "all":
-                    start = dt_util.utc_from_timestamp(0)
+                    start = HA_START
                     end = now
+                    delta = end - start
                 else:
-                    delta = {
-                        "minutes": timedelta(minutes=value),
-                        "hours": timedelta(hours=value),
-                        "days": timedelta(days=value),
-                        "weeks": timedelta(weeks=value),
-                        "months": timedelta(days=value * 30),
-                    }.get(unit, timedelta(days=value))
+                    if unit == "years":
+                        start = now.replace(
+                            month=1,
+                            day=1,
+                            hour=0,
+                            minute=0,
+                            second=0,
+                            microsecond=0,
+                        )
+                        end = now
+                        delta = end - start
+                    else:
+                        delta = {
+                            "minutes": timedelta(minutes=value),
+                            "hours": timedelta(hours=value),
+                            "days": timedelta(days=value),
+                            "weeks": timedelta(weeks=value),
+                            "months": relativedelta(months=value),
+                        }.get(unit, timedelta(days=value))
+
+                        start = now - delta
+                        end = now
 
                     if stat_type == "value_at":
-                        target_time = now - delta
+                        target_time = start if unit in ("years", "all") else now - delta
                         states = await self._get_states_around(
                             target_time, delta=timedelta(minutes=10)
                         )
@@ -114,9 +135,6 @@ class HistoricalStatsSensor(SensorEntity):
                             attrs[label] = STATE_UNKNOWN
                         continue
 
-                    start = now - delta
-                    end = now
-
                 states = await self._get_states_interval(start, end)
                 numeric_states = [
                     (float(s.state), s) for s in states if self._is_number(s.state)
@@ -124,6 +142,13 @@ class HistoricalStatsSensor(SensorEntity):
                 values_only = [val for val, _ in numeric_states]
 
                 if not numeric_states:
+                    # Try long-term statistics if states were purged
+                    fallback = await self._stats_fallback(stat_type, start, end)
+                    if fallback is not None:
+                        attrs[label] = fallback
+                        if fallback is STATE_UNKNOWN and status == STATE_OK:
+                            status = STATE_NO_DATA
+                        continue
                     attrs[label] = STATE_UNKNOWN
                     if status == STATE_OK:
                         status = STATE_NO_DATA
@@ -196,3 +221,32 @@ class HistoricalStatsSensor(SensorEntity):
         if not states:
             return None
         return min(states, key=lambda s: abs(s.last_changed - target_time))
+
+    async def _stats_fallback(self, stat_type, start, end):
+        """Return value from long-term statistics if available."""
+        if stat_type not in {"min", "max", "mean"}:
+            return None
+
+        stats = await self.hass.async_add_executor_job(
+            statistics_during_period,
+            self.hass,
+            start,
+            end,
+            {self._entity_id},
+            "hour",
+            None,
+            {stat_type},
+        )
+
+        rows = stats.get(self._entity_id)
+        if not rows:
+            return STATE_UNKNOWN
+
+        values = [row.get(stat_type) for row in rows if row.get(stat_type) is not None]
+        if not values:
+            return STATE_UNKNOWN
+
+        if stat_type == "mean":
+            return sum(values) / len(values)
+
+        return min(values) if stat_type == "min" else max(values)

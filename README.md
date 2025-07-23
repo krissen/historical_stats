@@ -62,7 +62,7 @@ For Home Assistant to recognize the new integration, restart the server.
 4. **Define your measurement points:**
 
 - Choose one or more statistics (min, max, mean, value at, total change).
-- Select the time period (e.g., "days ago", "weeks ago", or "all history").
+- Select the time period (e.g., "days ago", "weeks ago", "this year", or "all history").
 - Enter the number of units for the period (e.g., "7 days ago", "1 month ago").
 - Add as many points as you like.
 
@@ -128,13 +128,20 @@ TODO: Add screenshot of rendered table.
 Total this month: {{ energy.attributes['months_1_total'] }} kWh
 ```
 
+## Example: Yearly energy total
+
+```jinja
+{% set energy = states.sensor.historical_statistics_sensor_home_energy %}
+Total this year: {{ energy.attributes['years_1_total'] }} kWh
+```
+
 TODO: Add screenshot of the Markdown card.
 
 ---
 
 ## Limitations & Notes
 
-- The integration uses Home Assistant's history/recorder database. If you purge or limit your recorder history, statistics beyond that range will be unavailable.
+- The integration relies on Home Assistant's history database. If raw states have been purged, min/max/mean values fall back to long‑term statistics when available.
 - Only numeric states are supported.
 - The “total” statistic is the difference between the first and last value in the interval.
 - Large intervals may be slower to calculate if your database is very large.
