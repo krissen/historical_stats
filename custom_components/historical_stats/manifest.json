@@ -2,14 +2,16 @@
   "domain": "historical_stats",
   "name": "Historical statistics",
   "version": "0.1.0",
-  "codeowners": ["@krissen"],
-  "dependencies": ["recorder"],
+  "codeowners": [
+    "@krissen"
+  ],
+  "dependencies": [
+    "recorder"
+  ],
   "documentation": "https://github.com/krissen/historical_stats",
   "integration_type": "hub",
   "iot_class": "local_polling",
   "requirements": [],
   "issue_tracker": "https://github.com/krissen/historical_stats/issues",
-  "config_flow": true,
-  "version": "0.0.3-beta1"
+  "config_flow": true
 }
-

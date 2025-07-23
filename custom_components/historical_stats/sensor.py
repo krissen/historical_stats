@@ -6,6 +6,7 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.recorder.history import get_significant_states
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import STATE_UNKNOWN
+from homeassistant.helpers.event import async_track_time_interval
 
 from .const import STATE_ERROR, STATE_NO_DATA, STATE_OK
 from homeassistant.util import slugify
@@ -15,6 +16,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     """Set up a HistoricalStatsSensor from a config entry."""
     entity_id = entry.data["entity_id"]
     points = entry.options.get("points", [])
+    update_interval = entry.data.get("update_interval", 30)
     friendly_name = entry.data.get("friendly_name")
 
     if not friendly_name:
@@ -24,14 +26,15 @@ async def async_setup_entry(hass, entry, async_add_entities):
     name = f"Historical statistics for {friendly_name}"
 
     async_add_entities(
-        [HistoricalStatsSensor(hass, name, entity_id, points)], update_before_add=True
+        [HistoricalStatsSensor(hass, name, entity_id, points, update_interval)],
+        update_before_add=True,
     )
 
 
 class HistoricalStatsSensor(SensorEntity):
     """Sensor that calculates historical statistics for a given entity."""
 
-    def __init__(self, hass, name, entity_id, points):
+    def __init__(self, hass, name, entity_id, points, update_interval):
         self.hass = hass
         self._attr_name = name
         self._attr_unique_id = f"historical_stats_{slugify(entity_id)}"
@@ -40,6 +43,28 @@ class HistoricalStatsSensor(SensorEntity):
         self._points = points
         self._attr_native_value = STATE_UNKNOWN
         self._attr_extra_state_attributes = {}
+        self._update_interval = timedelta(minutes=update_interval)
+        self._unsub_timer = None
+        self._attr_should_poll = False
+
+    async def async_added_to_hass(self):
+        """Handle when entity is added to Home Assistant."""
+        await self.async_update()
+        self.async_write_ha_state()
+        self._unsub_timer = async_track_time_interval(
+            self.hass, self._handle_interval, self._update_interval
+        )
+
+    async def async_will_remove_from_hass(self):
+        """Cancel scheduled updates when entity is removed."""
+        if self._unsub_timer:
+            self._unsub_timer()
+            self._unsub_timer = None
+
+    async def _handle_interval(self, _now):
+        """Update the sensor at the scheduled interval."""
+        await self.async_update()
+        self.async_write_ha_state()
 
     @property
     def suggested_object_id(self):
