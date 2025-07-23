@@ -141,7 +141,7 @@ TODO: Add screenshot of the Markdown card.
 
 ## Limitations & Notes
 
-- The integration uses Home Assistant's history/recorder database. If you purge or limit your recorder history, statistics beyond that range will be unavailable.
+- The integration relies on Home Assistant's history database. If raw states have been purged, min/max/mean values fall back to long‑term statistics when available.
 - Only numeric states are supported.
 - The “total” statistic is the difference between the first and last value in the interval.
 - Large intervals may be slower to calculate if your database is very large.

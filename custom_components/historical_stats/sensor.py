@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
+from homeassistant.components.recorder.statistics import statistics_during_period
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.recorder.history import get_significant_states
@@ -141,6 +142,13 @@ class HistoricalStatsSensor(SensorEntity):
                 values_only = [val for val, _ in numeric_states]
 
                 if not numeric_states:
+                    # Try long-term statistics if states were purged
+                    fallback = await self._stats_fallback(stat_type, start, end)
+                    if fallback is not None:
+                        attrs[label] = fallback
+                        if fallback is STATE_UNKNOWN and status == STATE_OK:
+                            status = STATE_NO_DATA
+                        continue
                     attrs[label] = STATE_UNKNOWN
                     if status == STATE_OK:
                         status = STATE_NO_DATA
@@ -213,3 +221,32 @@ class HistoricalStatsSensor(SensorEntity):
         if not states:
             return None
         return min(states, key=lambda s: abs(s.last_changed - target_time))
+
+    async def _stats_fallback(self, stat_type, start, end):
+        """Return value from long-term statistics if available."""
+        if stat_type not in {"min", "max", "mean"}:
+            return None
+
+        stats = await self.hass.async_add_executor_job(
+            statistics_during_period,
+            self.hass,
+            start,
+            end,
+            {self._entity_id},
+            "hour",
+            None,
+            {stat_type},
+        )
+
+        rows = stats.get(self._entity_id)
+        if not rows:
+            return STATE_UNKNOWN
+
+        values = [row.get(stat_type) for row in rows if row.get(stat_type) is not None]
+        if not values:
+            return STATE_UNKNOWN
+
+        if stat_type == "mean":
+            return sum(values) / len(values)
+
+        return min(values) if stat_type == "min" else max(values)
