@@ -1,6 +1,8 @@
 # Historical statistics
 
-A flexible and efficient custom integration for [Home Assistant](https://www.home-assistant.io/) that exposes user-defined historical statistics for any entity. This component allows you to create virtual sensors that show min, max, mean, exact value at time, or total change over custom time periods – all configurable via the Home Assistant UI.
+A custom integration for [Home Assistant](https://www.home-assistant.io/) that exposes user-defined historical statistics for any entity with numerical stats. This component allows you to create virtual sensors that show min, max, mean, exact value at time, or total change over custom time periods.
+
+<img width="469" height="376" alt="Skärmavbild 2025-07-23 kl  12 32 31" src="https://github.com/user-attachments/assets/53c343c4-77f1-4cde-83ee-cc1431ea4f38" />
 
 ---
 
@@ -10,8 +12,7 @@ A flexible and efficient custom integration for [Home Assistant](https://www.hom
 - **Configurable measurement points:** Define as many time-based statistics as you want, such as "max last 7 days", "mean last 30 days", "value 24 hours ago", or "total change this month".
 - **Multiple statistics per time window:** Easily select several statistics (min, max, mean) for a single period in one step.
 - **All configuration via UI:** No YAML or manual editing needed; set up and edit everything through Home Assistant’s user interface.
-- **Smart caching:** Efficient use of Home Assistant’s history database; only queries necessary periods.
-- **Entity attributes:** Each measurement/statistic is available as an attribute on the virtual sensor.
+- **Entity attributes:** All measurements/statistics are available as attributes on one virtual sensor.
 
 ---
 
@@ -30,21 +31,19 @@ Home Assistant already includes a `statistics` sensor and a **statistical value*
 card. These work well for single measurements but quickly become unwieldy when
 many different periods or statistics are needed. Each metric usually requires its
 own sensor and they do not expose timestamps for the extreme values. Template
-sensors or Python scripts can do the job but require manual code and ongoing
-maintenance.
-
-This integration was created to keep things DRY and easier to maintain:
-
-- One virtual sensor can contain any number of statistics.
-- All configuration happens in the UI.
-- Database queries are cached to reduce load.
-
-The trade‑off is that you rely on this custom component and it only works with
-numeric states.
+sensors or Python scripts did not seem to do the job either. Enter this integration.
 
 ---
 
 ## Installation
+
+### HACS
+
+1. **Add custom repository** `https://github.com/krissen/historical_stats` of type `integration`
+2. **Add integration** `Historical statistics`
+3. **Restart** Home Assistant
+
+### Manually
 
 1. **Copy the custom component**  
    Place the entire `historical_stats` directory under your Home Assistant `custom_components/` folder.
@@ -87,12 +86,14 @@ The attribute naming follows `<period>_<statistic>` where the period is `unit_va
 1. Add a measurement point:
 
 - Statistic: Value at
-- Period: Days ago
-- Value: 1
+- Period: Hours ago
+- Value: 24
 
-2. The result appears as the attribute `days_1_value_at` on your sensor.
+2. The result appears as the attribute `hours_24_value_at` on your sensor.
 
 ## Example: Compare two temperature sensors
+
+<img width="469" height="376" alt="Skärmavbild 2025-07-23 kl  12 32 31" src="https://github.com/user-attachments/assets/53c343c4-77f1-4cde-83ee-cc1431ea4f38" />
 
 The following snippet can be used in a Markdown card to display several
 statistics for two sensors side by side.
@@ -118,24 +119,6 @@ statistics for two sensors side by side.
 <font color="#2196F3">{{ porch_stats.attributes['full_min_ts'][:16].replace('T',' ') }}</font> || <font color="#2196F3">{{ veranda_stats.attributes['full_min_ts'][:16].replace('T',' ') }}</font>
 <font color="#E53935">{{ porch_stats.attributes['full_max_ts'][:16].replace('T',' ') }}</font> | | <font color="#E53935">{{ veranda_stats.attributes['full_max_ts'][:16].replace('T',' ') }}</font>
 ```
-
-TODO: Add screenshot of rendered table.
-
-## Example: Monthly energy total
-
-```jinja
-{% set energy = states.sensor.historical_statistics_sensor_home_energy %}
-Total this month: {{ energy.attributes['months_1_total'] }} kWh
-```
-
-## Example: Yearly energy total
-
-```jinja
-{% set energy = states.sensor.historical_statistics_sensor_home_energy %}
-Total this year: {{ energy.attributes['years_1_total'] }} kWh
-```
-
-TODO: Add screenshot of the Markdown card.
 
 ---
 
