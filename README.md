@@ -1,6 +1,6 @@
 # Historical statistics
 
-A custom integration for [Home Assistant](https://www.home-assistant.io/) that exposes user-defined historical statistics for any entity with numerical stats. This component allows you to create virtual sensors that show min, max, mean, exact value at time, or total change over custom time periods.
+A custom integration for [Home Assistant](https://www.home-assistant.io/) that exposes user-defined historical statistics for any entity with numerical stats. This component allows you to create virtual sensors that show min, max, mean, exact value at time, total change, or sum over custom time periods.
 
 <img width="469" height="376" alt="Skärmavbild 2025-07-23 kl  12 32 31" src="https://github.com/user-attachments/assets/53c343c4-77f1-4cde-83ee-cc1431ea4f38" />
 
@@ -9,8 +9,9 @@ A custom integration for [Home Assistant](https://www.home-assistant.io/) that e
 ## Features
 
 - **Any source entity:** Works with any numeric sensor or entity with a numeric state.
-- **Configurable measurement points:** Define as many time-based statistics as you want, such as "max last 7 days", "mean last 30 days", "value 24 hours ago", or "total change this month".
-- **Multiple statistics per time window:** Easily select several statistics (min, max, mean) for a single period in one step.
+- **Configurable measurement points:** Define as many time-based statistics as you want, such as "max last 7 days", "mean last 30 days", "value 24 hours ago", "total change this month", or "sum last year".
+- **Custom time ranges:** Specify both the starting point and the ending point for each measurement.
+- **Multiple statistics per time window:** Easily select several statistics (min, max, mean, sum) for a single period in one step.
 - **All configuration via UI:** No YAML or manual editing needed; set up and edit everything through Home Assistant’s user interface.
 - **Entity attributes:** All measurements/statistics are available as attributes on one virtual sensor.
 
@@ -60,7 +61,7 @@ For Home Assistant to recognize the new integration, restart the server.
 3. **Set the update interval** (how often the statistics should be recalculated).
 4. **Define your measurement points:**
 
-- Choose one or more statistics (min, max, mean, value at, total change).
+- Choose one or more statistics (min, max, mean, sum, value at, total change).
 - Select the time period (e.g., "days ago", "weeks ago", "this year", or "all history").
 - Enter the number of units for the period (e.g., "7 days ago", "1 month ago").
 - Add as many points as you like.
