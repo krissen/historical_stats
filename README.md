@@ -67,6 +67,13 @@ For Home Assistant to recognize the new integration, restart the server.
 
 5. Save and finish.
 
+### Editing measurement points
+
+To modify the configuration later, open **Settings > Devices & Services**, locate
+your *Historical statistics* entry and choose **Configure**. You can then add,
+edit or remove points and press **Save changes**. The sensor will reload
+automatically with the new settings.
+
 All statistics for the entity will be available as attributes on a new sensor entity, e.g.
 `sensor.historical_statistics_sensor_outside_temperature`
 The attribute naming follows `<period>_<statistic>` where the period is `unit_value` like `days_7` or simply `full` for all history. Example: `days_7_min`.

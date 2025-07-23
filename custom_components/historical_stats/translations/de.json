@@ -31,7 +31,7 @@
           "add_point": "Messpunkt hinzufügen",
           "remove_indices": "Messpunkte entfernen",
           "edit_index": "Messpunkt bearbeiten",
-          "finish": "Fertig"
+          "finish": "Änderungen speichern"
         }
       },
       "add_point": {
@@ -67,7 +67,7 @@
     "days": "Vor Tagen",
     "weeks": "Vor Wochen",
     "months": "Vor Monaten",
-    "years": "Dieses Jahr",
-    "all": "Gesamte Historie"
+    "years": "Vor Jahren",
+    "all": "Seit jeher"
   }
 }
