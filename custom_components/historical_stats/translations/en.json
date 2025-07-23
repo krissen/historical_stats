@@ -54,5 +54,21 @@
                 }
             }
         }
+    },
+    "stat_type": {
+        "value_at": "Value at",
+        "min": "Minimum",
+        "max": "Maximum",
+        "mean": "Mean",
+        "total": "Total change"
+    },
+    "time_unit": {
+        "minutes": "Minutes ago",
+        "hours": "Hours ago",
+        "days": "Days ago",
+        "weeks": "Weeks ago",
+        "months": "Months ago",
+        "years": "This year",
+        "all": "All history"
     }
 }

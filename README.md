@@ -62,7 +62,7 @@ For Home Assistant to recognize the new integration, restart the server.
 4. **Define your measurement points:**
 
 - Choose one or more statistics (min, max, mean, value at, total change).
-- Select the time period (e.g., "days ago", "weeks ago", or "all history").
+- Select the time period (e.g., "days ago", "weeks ago", "this year", or "all history").
 - Enter the number of units for the period (e.g., "7 days ago", "1 month ago").
 - Add as many points as you like.
 
@@ -126,6 +126,13 @@ TODO: Add screenshot of rendered table.
 ```jinja
 {% set energy = states.sensor.historical_statistics_sensor_home_energy %}
 Total this month: {{ energy.attributes['months_1_total'] }} kWh
+```
+
+## Example: Yearly energy total
+
+```jinja
+{% set energy = states.sensor.historical_statistics_sensor_home_energy %}
+Total this year: {{ energy.attributes['years_1_total'] }} kWh
 ```
 
 TODO: Add screenshot of the Markdown card.
