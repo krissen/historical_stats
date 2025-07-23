@@ -140,6 +140,8 @@ If you update this custom component, always restart Home Assistant for changes t
 ## Contributing
 
 Pull requests and suggestions are welcome!  
-All code should be commented in English and follow KISS and DRY principles.
+
+- All code should be commented in English and follow KISS and DRY principles.
+- Please make PR:s to the `dev` branch, not master.
 
 ---
