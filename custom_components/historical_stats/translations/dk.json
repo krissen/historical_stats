@@ -31,7 +31,7 @@
           "add_point": "Tilføj målepunkt",
           "remove_indices": "Fjern målepunkter",
           "edit_index": "Redigér målepunkt",
-          "finish": "Afslut"
+          "finish": "Gem ændringer"
         }
       },
       "add_point": {
@@ -67,7 +67,7 @@
     "days": "Dage siden",
     "weeks": "Uger siden",
     "months": "Måneder siden",
-    "years": "Dette år",
-    "all": "Al historik"
+    "years": "For år siden",
+    "all": "Al tid"
   }
 }

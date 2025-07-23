@@ -31,7 +31,7 @@
           "add_point": "Lägg till mätpunkt",
           "remove_indices": "Ta bort mätpunkter",
           "edit_index": "Redigera mätpunkt",
-          "finish": "Klar"
+          "finish": "Spara ändringar"
         }
       },
       "add_point": {
@@ -67,7 +67,7 @@
     "days": "Dagar sedan",
     "weeks": "Veckor sedan",
     "months": "Månader sedan",
-    "years": "I år",
-    "all": "All historik"
+    "years": "För år sedan",
+    "all": "Någonsin"
   }
 }

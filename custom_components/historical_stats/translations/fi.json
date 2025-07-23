@@ -31,7 +31,7 @@
           "add_point": "Lisää piste",
           "remove_indices": "Poista pisteet",
           "edit_index": "Muokkaa pistettä",
-          "finish": "Valmis"
+          "finish": "Tallenna muutokset"
         }
       },
       "add_point": {
@@ -67,7 +67,7 @@
     "days": "Päivää sitten",
     "weeks": "Viikkoa sitten",
     "months": "Kuukautta sitten",
-    "years": "Tänä vuonna",
-    "all": "Koko historia"
+    "years": "Vuotta sitten",
+    "all": "Kaikki ajat"
   }
 }

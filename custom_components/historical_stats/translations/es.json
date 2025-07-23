@@ -31,7 +31,7 @@
           "add_point": "Agregar punto",
           "remove_indices": "Eliminar puntos",
           "edit_index": "Editar punto",
-          "finish": "Finalizar"
+          "finish": "Guardar cambios"
         }
       },
       "add_point": {
@@ -67,7 +67,7 @@
     "days": "Hace días",
     "weeks": "Hace semanas",
     "months": "Hace meses",
-    "years": "Este año",
-    "all": "Todo el historial"
+    "years": "Hace años",
+    "all": "Todo el tiempo"
   }
 }

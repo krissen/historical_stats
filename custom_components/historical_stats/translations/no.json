@@ -31,7 +31,7 @@
           "add_point": "Legg til punkt",
           "remove_indices": "Fjern punkter",
           "edit_index": "Rediger punkt",
-          "finish": "Fullfør"
+          "finish": "Lagre endringer"
         }
       },
       "add_point": {
@@ -67,7 +67,7 @@
     "days": "Dager siden",
     "weeks": "Uker siden",
     "months": "Måneder siden",
-    "years": "I år",
-    "all": "All historikk"
+    "years": "For år siden",
+    "all": "All tid"
   }
 }
