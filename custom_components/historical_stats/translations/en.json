@@ -68,7 +68,7 @@
         "days": "Days ago",
         "weeks": "Weeks ago",
         "months": "Months ago",
-        "years": "This year",
-        "all": "All history"
+        "years": "Years ago",
+        "all": "Ever"
     }
 }
