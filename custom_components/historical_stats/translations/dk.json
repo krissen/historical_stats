@@ -17,7 +17,9 @@
           "stat_types": "Statistiktyper",
           "time_unit": "Tidsenhed",
           "time_value": "Tidsværdi",
-          "add_another": "Tilføj en mere"
+          "add_another": "Tilføj en mere",
+          "time_unit_to": "Tidsenhed (til)",
+          "time_value_to": "Tidsværdi (til)"
         }
       }
     }
@@ -39,8 +41,10 @@
         "description": "Indstil parametre for målepunktet.",
         "data": {
           "stat_type": "Statistiktype",
-          "time_unit": "Tidsenhed",
-          "time_value": "Tidsværdi"
+          "time_unit": "Tidsenhed (fra)",
+          "time_value": "Tidsværdi (fra)",
+          "time_unit_to": "Tidsenhed (til)",
+          "time_value_to": "Tidsværdi (til)"
         }
       },
       "edit_point": {
@@ -48,8 +52,10 @@
         "description": "Opdatér parametre for målepunktet.",
         "data": {
           "stat_type": "Statistiktype",
-          "time_unit": "Tidsenhed",
-          "time_value": "Tidsværdi"
+          "time_unit": "Tidsenhed (fra)",
+          "time_value": "Tidsværdi (fra)",
+          "time_unit_to": "Tidsenhed (til)",
+          "time_value_to": "Tidsværdi (til)"
         }
       }
     }
@@ -59,7 +65,8 @@
     "min": "Minimum",
     "max": "Maksimum",
     "mean": "Gennemsnit",
-    "total": "Total ændring"
+    "total": "Total ændring",
+    "sum": "Sum"
   },
   "time_unit": {
     "minutes": "Minutter siden",
