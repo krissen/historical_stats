@@ -171,14 +171,17 @@ class HistoricalStatsSensor(SensorEntity):
         """Return all recorded states in interval."""
         return (
             await self.hass.async_add_executor_job(
-                get_significant_states,
-                self.hass,
-                start,
-                end,
-                [self._entity_id],
-                None,
-                True,
-                False,
+                lambda: get_significant_states(
+                    self.hass,
+                    start,
+                    end,
+                    [self._entity_id],
+                    None,
+                    True,  # minimal_response
+                    False,  # no_attributes
+                    False,  # include all state changes
+                    True,  # include state at start time
+                )
             )
         )[self._entity_id]
 
