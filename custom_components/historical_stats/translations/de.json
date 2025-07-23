@@ -1,0 +1,73 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Historische Statistiken konfigurieren",
+        "description": "Wählen Sie die Quell-Entität und das Aktualisierungsintervall.",
+        "data": {
+          "entity_id": "Entität",
+          "update_interval": "Aktualisierungsintervall (Minuten)",
+          "friendly_name": "Benutzerdefinierter Name"
+        }
+      },
+      "add_point": {
+        "title": "Messpunkt hinzufügen",
+        "description": "{info}",
+        "data": {
+          "stat_types": "Statistikarten",
+          "time_unit": "Zeiteinheit",
+          "time_value": "Zeitwert",
+          "add_another": "Weiteren hinzufügen"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Messpunkte konfigurieren",
+        "description": "{current_points}",
+        "data": {
+          "add_point": "Messpunkt hinzufügen",
+          "remove_indices": "Messpunkte entfernen",
+          "edit_index": "Messpunkt bearbeiten",
+          "finish": "Fertig"
+        }
+      },
+      "add_point": {
+        "title": "Messpunkt hinzufügen",
+        "description": "Stellen Sie die Parameter für den Messpunkt ein.",
+        "data": {
+          "stat_type": "Statistikart",
+          "time_unit": "Zeiteinheit",
+          "time_value": "Zeitwert"
+        }
+      },
+      "edit_point": {
+        "title": "Messpunkt bearbeiten",
+        "description": "Aktualisieren Sie die Parameter für den Messpunkt.",
+        "data": {
+          "stat_type": "Statistikart",
+          "time_unit": "Zeiteinheit",
+          "time_value": "Zeitwert"
+        }
+      }
+    }
+  },
+  "stat_type": {
+    "value_at": "Wert um",
+    "min": "Minimum",
+    "max": "Maximum",
+    "mean": "Mittelwert",
+    "total": "Gesamtänderung"
+  },
+  "time_unit": {
+    "minutes": "Vor Minuten",
+    "hours": "Vor Stunden",
+    "days": "Vor Tagen",
+    "weeks": "Vor Wochen",
+    "months": "Vor Monaten",
+    "years": "Dieses Jahr",
+    "all": "Gesamte Historie"
+  }
+}

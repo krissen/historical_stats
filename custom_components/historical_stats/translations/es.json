@@ -1,0 +1,73 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurar estadísticas históricas",
+        "description": "Seleccione la entidad fuente y el intervalo de actualización.",
+        "data": {
+          "entity_id": "Entidad",
+          "update_interval": "Intervalo de actualización (minutos)",
+          "friendly_name": "Nombre personalizado"
+        }
+      },
+      "add_point": {
+        "title": "Agregar punto de medición",
+        "description": "{info}",
+        "data": {
+          "stat_types": "Tipos de estadísticas",
+          "time_unit": "Unidad de tiempo",
+          "time_value": "Valor de tiempo",
+          "add_another": "Agregar otro"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configurar puntos de medición",
+        "description": "{current_points}",
+        "data": {
+          "add_point": "Agregar punto",
+          "remove_indices": "Eliminar puntos",
+          "edit_index": "Editar punto",
+          "finish": "Finalizar"
+        }
+      },
+      "add_point": {
+        "title": "Agregar punto de medición",
+        "description": "Establecer los parámetros del punto de medición.",
+        "data": {
+          "stat_type": "Tipo de estadística",
+          "time_unit": "Unidad de tiempo",
+          "time_value": "Valor de tiempo"
+        }
+      },
+      "edit_point": {
+        "title": "Editar punto de medición",
+        "description": "Actualice los parámetros del punto de medición.",
+        "data": {
+          "stat_type": "Tipo de estadística",
+          "time_unit": "Unidad de tiempo",
+          "time_value": "Valor de tiempo"
+        }
+      }
+    }
+  },
+  "stat_type": {
+    "value_at": "Valor en",
+    "min": "Mínimo",
+    "max": "Máximo",
+    "mean": "Promedio",
+    "total": "Cambio total"
+  },
+  "time_unit": {
+    "minutes": "Hace minutos",
+    "hours": "Hace horas",
+    "days": "Hace días",
+    "weeks": "Hace semanas",
+    "months": "Hace meses",
+    "years": "Este año",
+    "all": "Todo el historial"
+  }
+}

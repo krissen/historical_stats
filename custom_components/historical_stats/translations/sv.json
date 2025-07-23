@@ -1,0 +1,73 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Konfigurera historisk statistik",
+        "description": "Välj källa och uppdateringsintervall.",
+        "data": {
+          "entity_id": "Entitet",
+          "update_interval": "Uppdateringsintervall (minuter)",
+          "friendly_name": "Eget namn"
+        }
+      },
+      "add_point": {
+        "title": "Lägg till mätpunkt",
+        "description": "{info}",
+        "data": {
+          "stat_types": "Statistiktyp(er)",
+          "time_unit": "Tidsenhet",
+          "time_value": "Tidsvärde",
+          "add_another": "Lägg till en till"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Konfigurera mätpunkter",
+        "description": "{current_points}",
+        "data": {
+          "add_point": "Lägg till mätpunkt",
+          "remove_indices": "Ta bort mätpunkter",
+          "edit_index": "Redigera mätpunkt",
+          "finish": "Klar"
+        }
+      },
+      "add_point": {
+        "title": "Lägg till mätpunkt",
+        "description": "Ställ in parametrar för mätpunkten.",
+        "data": {
+          "stat_type": "Statistiktyp",
+          "time_unit": "Tidsenhet",
+          "time_value": "Tidsvärde"
+        }
+      },
+      "edit_point": {
+        "title": "Redigera mätpunkt",
+        "description": "Uppdatera parametrarna för mätpunkten.",
+        "data": {
+          "stat_type": "Statistiktyp",
+          "time_unit": "Tidsenhet",
+          "time_value": "Tidsvärde"
+        }
+      }
+    }
+  },
+  "stat_type": {
+    "value_at": "Värde vid",
+    "min": "Minsta",
+    "max": "Högsta",
+    "mean": "Medelvärde",
+    "total": "Total förändring"
+  },
+  "time_unit": {
+    "minutes": "Minuter sedan",
+    "hours": "Timmar sedan",
+    "days": "Dagar sedan",
+    "weeks": "Veckor sedan",
+    "months": "Månader sedan",
+    "years": "I år",
+    "all": "All historik"
+  }
+}

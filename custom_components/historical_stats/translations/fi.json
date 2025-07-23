@@ -1,0 +1,73 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Aseta historialliset tilastot",
+        "description": "Valitse lähde-entiteetti ja päivitysväli.",
+        "data": {
+          "entity_id": "Entiteetti",
+          "update_interval": "Päivitysväli (minuuttia)",
+          "friendly_name": "Mukautettu nimi"
+        }
+      },
+      "add_point": {
+        "title": "Lisää mittauspiste",
+        "description": "{info}",
+        "data": {
+          "stat_types": "Tilastotyypit",
+          "time_unit": "Aikayksikkö",
+          "time_value": "Aika-arvo",
+          "add_another": "Lisää toinen"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Aseta mittauspisteet",
+        "description": "{current_points}",
+        "data": {
+          "add_point": "Lisää piste",
+          "remove_indices": "Poista pisteet",
+          "edit_index": "Muokkaa pistettä",
+          "finish": "Valmis"
+        }
+      },
+      "add_point": {
+        "title": "Lisää mittauspiste",
+        "description": "Aseta mittauspisteen parametrit.",
+        "data": {
+          "stat_type": "Tilastotyyppi",
+          "time_unit": "Aikayksikkö",
+          "time_value": "Aika-arvo"
+        }
+      },
+      "edit_point": {
+        "title": "Muokkaa mittauspistettä",
+        "description": "Päivitä mittauspisteen parametrit.",
+        "data": {
+          "stat_type": "Tilastotyyppi",
+          "time_unit": "Aikayksikkö",
+          "time_value": "Aika-arvo"
+        }
+      }
+    }
+  },
+  "stat_type": {
+    "value_at": "Arvo ajassa",
+    "min": "Minimi",
+    "max": "Maksimi",
+    "mean": "Keskiarvo",
+    "total": "Kokonaissmuutos"
+  },
+  "time_unit": {
+    "minutes": "Minuuttia sitten",
+    "hours": "Tuntia sitten",
+    "days": "Päivää sitten",
+    "weeks": "Viikkoa sitten",
+    "months": "Kuukautta sitten",
+    "years": "Tänä vuonna",
+    "all": "Koko historia"
+  }
+}

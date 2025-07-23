@@ -1,0 +1,73 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Konfigurer historiske statistikker",
+        "description": "Vælg kilde-entitet og opdateringsinterval.",
+        "data": {
+          "entity_id": "Entitet",
+          "update_interval": "Opdateringsinterval (minutter)",
+          "friendly_name": "Brugertilpasset navn"
+        }
+      },
+      "add_point": {
+        "title": "Tilføj målepunkt",
+        "description": "{info}",
+        "data": {
+          "stat_types": "Statistiktyper",
+          "time_unit": "Tidsenhed",
+          "time_value": "Tidsværdi",
+          "add_another": "Tilføj en mere"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Konfigurer målepunkter",
+        "description": "{current_points}",
+        "data": {
+          "add_point": "Tilføj målepunkt",
+          "remove_indices": "Fjern målepunkter",
+          "edit_index": "Redigér målepunkt",
+          "finish": "Afslut"
+        }
+      },
+      "add_point": {
+        "title": "Tilføj målepunkt",
+        "description": "Indstil parametre for målepunktet.",
+        "data": {
+          "stat_type": "Statistiktype",
+          "time_unit": "Tidsenhed",
+          "time_value": "Tidsværdi"
+        }
+      },
+      "edit_point": {
+        "title": "Redigér målepunkt",
+        "description": "Opdatér parametre for målepunktet.",
+        "data": {
+          "stat_type": "Statistiktype",
+          "time_unit": "Tidsenhed",
+          "time_value": "Tidsværdi"
+        }
+      }
+    }
+  },
+  "stat_type": {
+    "value_at": "Værdi på",
+    "min": "Minimum",
+    "max": "Maksimum",
+    "mean": "Gennemsnit",
+    "total": "Total ændring"
+  },
+  "time_unit": {
+    "minutes": "Minutter siden",
+    "hours": "Timer siden",
+    "days": "Dage siden",
+    "weeks": "Uger siden",
+    "months": "Måneder siden",
+    "years": "Dette år",
+    "all": "Al historik"
+  }
+}
