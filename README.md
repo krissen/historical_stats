@@ -24,6 +24,26 @@ A flexible and efficient custom integration for [Home Assistant](https://www.hom
 
 ---
 
+## Comparison to existing solutions
+
+Home Assistant already includes a `statistics` sensor and a **statistical value**
+card. These work well for single measurements but quickly become unwieldy when
+many different periods or statistics are needed. Each metric usually requires its
+own sensor and they do not expose timestamps for the extreme values. Template
+sensors or Python scripts can do the job but require manual code and ongoing
+maintenance.
+
+This integration was created to keep things DRY and easier to maintain:
+
+- One virtual sensor can contain any number of statistics.
+- All configuration happens in the UI.
+- Database queries are cached to reduce load.
+
+The trade‑off is that you rely on this custom component and it only works with
+numeric states.
+
+---
+
 ## Installation
 
 1. **Copy the custom component**  
@@ -71,6 +91,44 @@ The attribute naming follows `<period>_<statistic>` where the period is `unit_va
 - Value: 1
 
 2. The result appears as the attribute `days_1_value_at` on your sensor.
+
+## Example: Compare two temperature sensors
+
+The following snippet can be used in a Markdown card to display several
+statistics for two sensors side by side.
+
+```jinja
+{% set porch_stats = states.sensor.historical_statistics_sensor_porch_temperature %}
+{% set veranda_stats = states.sensor.historical_statistics_sensor_veranda_temperature %}
+
+|        |  | Porch || Veranda |
+|--------|--|:-----:|--|:------:|
+| Now    |  | {{ states('sensor.porch_temperature') }} °C || {{ states('sensor.veranda_temperature') }} °C |
+| Yesterday | | {{ porch_stats.attributes['hours_24_value_at'] }} °C || {{ veranda_stats.attributes['hours_24_value_at'] }} °C |
+| <font color="#2196F3">Week min.</font> | | <font color="#2196F3">{{ porch_stats.attributes['weeks_1_min'] }} °C</font> || <font color="#2196F3">{{ veranda_stats.attributes['weeks_1_min'] }} °C</font> |
+| <font color="#E53935">Week max.</font> | | <font color="#E53935">{{ porch_stats.attributes['weeks_1_max'] }} °C</font> || <font color="#E53935">{{ veranda_stats.attributes['weeks_1_max'] }} °C</font> |
+| <font color="#2196F3">Overall min.</font> | | <font color="#2196F3">{{ porch_stats.attributes['full_min'] }} °C</font> || <font color="#2196F3">{{ veranda_stats.attributes['full_min'] }} °C</font> |
+| <font color="#E53935">Overall max.</font> | | <font color="#E53935">{{ porch_stats.attributes['full_max'] }} °C</font> || <font color="#E53935">{{ veranda_stats.attributes['full_max'] }} °C</font> |
+
+---
+|        |   | |
+|:------:|---------|:-------:|
+<font color="#2196F3">{{ porch_stats.attributes['weeks_1_min_ts'][:16].replace('T',' ') }}</font> | | <font color="#2196F3">{{ veranda_stats.attributes['weeks_1_min_ts'][:16].replace('T',' ') }}</font>
+<font color="#E53935">{{ porch_stats.attributes['weeks_1_max_ts'][:16].replace('T',' ') }}</font> || <font color="#E53935">{{ veranda_stats.attributes['weeks_1_max_ts'][:16].replace('T',' ') }}</font>
+<font color="#2196F3">{{ porch_stats.attributes['full_min_ts'][:16].replace('T',' ') }}</font> || <font color="#2196F3">{{ veranda_stats.attributes['full_min_ts'][:16].replace('T',' ') }}</font>
+<font color="#E53935">{{ porch_stats.attributes['full_max_ts'][:16].replace('T',' ') }}</font> | | <font color="#E53935">{{ veranda_stats.attributes['full_max_ts'][:16].replace('T',' ') }}</font>
+```
+
+TODO: Add screenshot of rendered table.
+
+## Example: Monthly energy total
+
+```jinja
+{% set energy = states.sensor.historical_statistics_sensor_home_energy %}
+Total this month: {{ energy.attributes['months_1_total'] }} kWh
+```
+
+TODO: Add screenshot of the Markdown card.
 
 ---
 
