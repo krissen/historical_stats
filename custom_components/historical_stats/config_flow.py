@@ -1,8 +1,5 @@
 """Config flow for the Historical statistics integration."""
 
-import json
-from pathlib import Path
-
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.helpers.selector import (
@@ -10,22 +7,12 @@ from homeassistant.helpers.selector import (
     NumberSelector,
     SelectSelector,
 )
+from homeassistant.helpers import translation
 
 from .const import DOMAIN
 
 # Available statistic types
 STAT_TYPES = ["value_at", "min", "max", "mean", "total", "sum"]
-
-TRANSLATIONS_DIR = Path(__file__).parent / "translations"
-
-
-def _read_translations(language: str) -> dict:
-    """Return translations for the given language or English as fallback."""
-    file = TRANSLATIONS_DIR / f"{language}.json"
-    if not file.exists():
-        file = TRANSLATIONS_DIR / "en.json"
-    with open(file, encoding="utf-8") as f:
-        return json.load(f)
 
 
 class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -42,11 +29,19 @@ class HistoricalStatsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Load translations based on the configured language."""
         if self._translations_loaded:
             return
-        translations = await self.hass.async_add_executor_job(
-            _read_translations, self.hass.config.language
+        lang = self.hass.config.language
+        stat_type_strings = await translation.async_get_translations(
+            self.hass, lang, "stat_type", integrations=[DOMAIN]
         )
-        self.stat_type_labels = translations.get("stat_type", {})
-        self.time_units = translations.get("time_unit", {})
+        time_unit_strings = await translation.async_get_translations(
+            self.hass, lang, "time_unit", integrations=[DOMAIN]
+        )
+        self.stat_type_labels = {
+            key.split(".")[-1]: value for key, value in stat_type_strings.items()
+        }
+        self.time_units = {
+            key.split(".")[-1]: value for key, value in time_unit_strings.items()
+        }
         self._translations_loaded = True
 
     async def async_step_user(self, user_input=None):
@@ -170,11 +165,19 @@ class HistoricalStatsOptionsFlow(config_entries.OptionsFlow):
         """Load translations based on the configured language."""
         if self._translations_loaded:
             return
-        translations = await self.config_entry.hass.async_add_executor_job(
-            _read_translations, self.config_entry.hass.config.language
+        lang = self.config_entry.hass.config.language
+        stat_type_strings = await translation.async_get_translations(
+            self.config_entry.hass, lang, "stat_type", integrations=[DOMAIN]
         )
-        self.stat_type_labels = translations.get("stat_type", {})
-        self.time_units = translations.get("time_unit", {})
+        time_unit_strings = await translation.async_get_translations(
+            self.config_entry.hass, lang, "time_unit", integrations=[DOMAIN]
+        )
+        self.stat_type_labels = {
+            key.split(".")[-1]: value for key, value in stat_type_strings.items()
+        }
+        self.time_units = {
+            key.split(".")[-1]: value for key, value in time_unit_strings.items()
+        }
         self._translations_loaded = True
 
     async def async_step_init(self, user_input=None):
